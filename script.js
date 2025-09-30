@@ -12,16 +12,22 @@ const E = {
   resultContainer: document.getElementById('resultContainer'),
   shortUrlOutput: document.getElementById('shortUrlOutput'),
   copyBtn: document.getElementById('copyBtn'),
+  // Verification Elements
   stepTitle: document.getElementById('stepTitle'),
   stepDesc: document.getElementById('stepDesc'),
+  currentStepNum: document.getElementById('currentStepNum'),
   verifyBtn: document.getElementById('verifyBtn'),
   continueBtn: document.getElementById('continueBtn'),
   progressBarFill: document.getElementById('fill'),
+  progressBarContainer: document.getElementById('progressBarContainer'),
   statusText: document.getElementById('status'),
+  completedCount: document.getElementById('completedCount'),
   unlockBtn: document.getElementById('unlock-btn'),
   resetBtn: document.getElementById('reset-btn'),
   requiredStepsLabel: document.getElementById('requiredStepsLabel')
 };
+
+/* --- Storage and State Management --- */
 
 function encodeKey(target){
   return STORAGE_PREFIX + btoa(target);
@@ -31,7 +37,8 @@ function getRequiredSteps() {
   try {
     const url = new URL(window.location.href);
     const stepsParam = parseInt(url.searchParams.get('steps'), 10);
-    if (Number.isInteger(stepsParam) && stepsParam >= 1 && stepsParam <= 10) return stepsParam;
+    // Enforce reasonable limits for steps
+    if (Number.isInteger(stepsParam) && stepsParam >= 1 && stepsParam <= 5) return stepsParam;
   } catch(e) {}
   return DEFAULT_REQUIRED_STEPS;
 }
@@ -52,7 +59,14 @@ function readState(target){
     const raw = localStorage.getItem(encodeKey(target));
     if(!raw) return {count:0, startedAt:0};
     const obj = JSON.parse(raw);
-    return {count: Number(obj.count||0), startedAt: Number(obj.startedAt||0)};
+    const state = {count: Number(obj.count||0), startedAt: Number(obj.startedAt||0)};
+    
+    // Check for expiration immediately on read
+    if (isExpired(state)) {
+        resetState(target, false); // Reset in storage but don't force UI update yet
+        return {count:0, startedAt:0};
+    }
+    return state;
   }catch(e){ return {count:0, startedAt:0}; }
 }
 
@@ -62,10 +76,10 @@ function writeState(target, state){
   localStorage.setItem(encodeKey(target), JSON.stringify(toStore));
 }
 
-function resetState(target){
+function resetState(target, update = true){
   if(!target) return;
   localStorage.removeItem(encodeKey(target));
-  updateUI();
+  if(update) updateUI();
 }
 
 function isExpired(state){
@@ -73,85 +87,109 @@ function isExpired(state){
   return (Date.now() - state.startedAt) > VERIFICATION_TTL_MS;
 }
 
-// Shortener
+/* --- Link Shortener --- */
+
 function shortenLink(){
   const longUrl = E.longUrlInput.value.trim();
-  if(!longUrl) { alert('Please enter a URL'); return; }
+  if(!longUrl) { alert('Please enter a valid URL'); return; }
   let normalized = longUrl;
   if(!/^https?:\/\//i.test(normalized)) normalized = 'https://' + normalized;
   try{
     new URL(normalized);
-  }catch(e){ alert('Invalid URL'); return; }
+  }catch(e){ alert('Invalid URL format'); return; }
+  
   const encodedTarget = encodeURIComponent(normalized);
   const base = window.location.origin + window.location.pathname;
-  const shortUrl = `${base}?target=${encodedTarget}`;
+  // Always include steps=N for clarity, and start at step=1
+  const steps = getRequiredSteps();
+  const shortUrl = `${base}?target=${encodedTarget}&steps=${steps}&step=1`;
+  
   E.shortUrlOutput.value = shortUrl;
   E.resultContainer.style.display = 'flex';
   E.longUrlInput.value = '';
-  // store the target in a friendly place too (optional)
-  localStorage.setItem('dareloom_target', normalized);
 }
 
 function copyLink(){
   E.shortUrlOutput.select();
+  E.shortUrlOutput.setSelectionRange(0, 99999); // For mobile devices
   document.execCommand('copy');
-  E.copyBtn.textContent = 'Copied! ✓';
+  E.copyBtn.textContent = 'Copied! ✅';
   setTimeout(()=>E.copyBtn.textContent='Copy Link', 2000);
 }
 
-// UI updates for progress
+/* --- Verification UI and Logic --- */
+
 function updateUI(){
   const target = getTargetFromURL();
   const req = getRequiredSteps();
   E.requiredStepsLabel.textContent = req;
-  const state = target ? readState(target) : {count:0, startedAt:0};
-  // if expired, reset state
-  if(target && isExpired(state)){
-    writeState(target, {count:0, startedAt:0});
-  }
-  const count = (target ? readState(target).count : 0);
+  
+  // State is read and expiration check is performed
+  const state = readState(target); 
+  const count = state.count;
+
+  // Update Progress Bar
   const pct = Math.min(100, Math.round((count / req) * 100));
   E.progressBarFill.style.width = pct + '%';
-  E.statusText.textContent = `${count} / ${req} completed`;
-  // unlock button visibility
+  E.progressBarContainer.setAttribute('aria-valuenow', count);
+  E.completedCount.textContent = count;
+  E.statusText.textContent = `${count} / ${req} steps completed`;
+  
+  // Unlock button visibility
   const unlocked = count >= req;
   E.unlockBtn.disabled = !unlocked;
-  E.unlockBtn.style.display = unlocked ? 'inline-block' : 'none';
+  // Add a class for better styling
+  if(unlocked) {
+      E.unlockBtn.classList.add('ready');
+      E.unlockBtn.style.display = 'inline-block';
+  } else {
+      E.unlockBtn.classList.remove('ready');
+      E.unlockBtn.style.display = 'none';
+  }
 }
 
-// inject ad script and increment for current target
+// Inject ad script and increment count for current target
 function injectAdAndCountFor(target){
   if(!target) return false;
-  // open blank popup to improve popunder chance (may be blocked)
+  
+  // 1. Open blank popup to improve popunder chance (may be blocked by browser)
   let popup = null;
-  try{ popup = window.open('about:blank', '_blank'); }catch(e){ popup = null; }
+  try{ popup = window.open('about:blank', '_blank', 'noopener'); }catch(e){ popup = null; }
+  
+  // 2. Inject Ad Script
   const s = document.createElement('script');
   s.type = 'text/javascript';
   s.src = AD_SCRIPT;
   s.async = true;
   document.body.appendChild(s);
-  // update state
+  
+  // 3. Update State
   const state = readState(target);
   const req = getRequiredSteps();
-  if(!state.startedAt) state.startedAt = Date.now();
+  if(!state.startedAt) state.startedAt = Date.now(); // Start timer on first verification attempt
+  
   if(state.count < req){
     state.count++;
     writeState(target, state);
   }
-  // close popup if possible
+  
+  // 4. Close popup (The ad script usually redirects this blank page)
   if(popup && !popup.closed){
-    try{ popup.close(); }catch(e){}
+    try{ popup.close(); }catch(e){} // Browser security might prevent this
   }
+  
   updateUI();
   return true;
 }
 
-// get current step index from URL (1-based)
+// Get current step index from URL (1-based)
 function getCurrentStepIndex(){
   try{
     const url = new URL(window.location.href);
     const s = parseInt(url.searchParams.get('step'), 10);
-    return (Number.isInteger(s) && s >= 1) ? s : 1;
+    // Ensure step is within valid range (1 to required steps)
+    const req = getRequiredSteps();
+    return (Number.isInteger(s) && s >= 1 && s <= req) ? s : 1;
   }catch(e){ return 1; }
 }
 
@@ -163,40 +201,46 @@ function navigateToStep(step){
 
 // Unlock (open target)
 function unlockLinkFor(target){
-  if(!target) { alert('No target specified'); return; }
+  if(!target) { alert('No target specified for unlock'); return; }
+  
+  // Add a quick visual indicator that the link is opening
+  E.unlockBtn.textContent = 'Redirecting...';
+  E.unlockBtn.disabled = true;
+
+  // Open the link in a new tab for a better UX
   const opened = window.open(target, '_blank', 'noopener,noreferrer');
-  if(!opened) window.location.href = target;
+  
+  if(!opened){
+    // Fallback if browser blocked the popup (rare for a user-initiated click)
+    window.location.href = target;
+  } else {
+      // Once opened, reset the verification progress to prevent link sharing
+      resetState(getTargetFromURL(), false); 
+  }
 }
 
-// Initialization
+/* --- Initialization --- */
+
 document.addEventListener('DOMContentLoaded', ()=>{
   // Attach shortener events
   if(E.shortenBtn) E.shortenBtn.addEventListener('click', shortenLink);
   if(E.copyBtn) E.copyBtn.addEventListener('click', copyLink);
 
-  const urlObj = new URL(window.location.href);
   const target = getTargetFromURL();
   const req = getRequiredSteps();
   const currentStep = getCurrentStepIndex();
-  E.requiredStepsLabel.textContent = req;
 
-  // If no target in URL, show normal shortener page; show verification card but disabled
+  // Shortener-only view
   if(!target){
-    // nothing more to do
     updateUI();
     return;
   }
+  
+  // Verification view setup
+  
+  updateUI(); // Initial UI update based on stored state
 
-  // When target changes (different encoded URL), we operate per-target via storage key so progress doesn't carry over.
-  // If the stored verification is expired, reset it.
-  const state = readState(target);
-  if(isExpired(state)){
-    writeState(target, {count:0, startedAt:0});
-  }
-
-  updateUI();
-
-  // Setup social bar script only on verification pages
+  // Setup social bar script for verification pages
   const socialScript = document.createElement('script');
   socialScript.type = 'text/javascript';
   socialScript.src = SOCIAL_BAR_SCRIPT;
@@ -206,24 +250,28 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // Prepare single-step UI
   const totalSteps = req;
   const stepLabel = `Step ${currentStep}`;
-  if(document.getElementById('stepTitle')) document.getElementById('stepTitle').textContent = stepLabel;
-  if(document.getElementById('stepDesc')) document.getElementById('stepDesc').textContent = `Complete verification for ${stepLabel}. Click Verify to proceed.`;
+  if(E.stepTitle) E.stepTitle.textContent = stepLabel;
+  if(E.currentStepNum) E.currentStepNum.textContent = currentStep;
+  if(E.stepDesc) E.stepDesc.textContent = `You must complete the task for ${stepLabel} to continue.`;
 
-  // Show/Hide buttons based on state and step
+  // Get current state
   const curState = readState(target);
   const count = curState.count;
   const alreadyDoneSteps = Math.min(count, totalSteps);
 
-  // If we've already completed this step (i.e., count >= currentStep), show Continue immediately (unless last)
-  const verifyBtn = document.getElementById('verifyBtn');
-  const continueBtn = document.getElementById('continueBtn');
-  const unlockBtn = document.getElementById('unlock-btn');
-  const resetBtn = document.getElementById('reset-btn');
+  // Verification button logic
+  const verifyBtn = E.verifyBtn;
+  const continueBtn = E.continueBtn;
+  const unlockBtn = E.unlockBtn;
+  const resetBtn = E.resetBtn;
+  
+  const DELAY_SECONDS = 10;
 
   function showContinueWithDelay(){
+    verifyBtn.style.display = 'none';
     continueBtn.style.display = 'inline-block';
     continueBtn.disabled = true;
-    let timer = 10;
+    let timer = DELAY_SECONDS;
     continueBtn.textContent = `Continue (${timer}s)`;
     const id = setInterval(()=>{
       timer--;
@@ -235,39 +283,50 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }, 1000);
   }
 
-  // If this step already completed
+  // Check if current step is already completed
   if(alreadyDoneSteps >= currentStep){
     verifyBtn.disabled = true;
-    verifyBtn.textContent = 'Done ✓';
-    // if not last step, show continue (enabled after 10s)
+    verifyBtn.textContent = 'Completed ✅';
+    verifyBtn.classList.add('completed'); // Add class for styling
+
+    // If not the last step, show continue (enabled after delay)
     if(currentStep < totalSteps){
       showContinueWithDelay();
     } else {
-      // last step done -> show unlock
+      // Last step done -> enable unlock
       unlockBtn.style.display = 'inline-block';
       unlockBtn.disabled = false;
+      unlockBtn.classList.add('ready');
     }
   } else {
     // Not completed: show verify button, hide continue
     verifyBtn.disabled = false;
     verifyBtn.textContent = 'Verify';
     continueBtn.style.display = 'none';
+    verifyBtn.classList.remove('completed');
   }
 
+  // Event Listeners for Verification
+  
   // Verify button action
   verifyBtn.addEventListener('click', ()=>{
     verifyBtn.disabled = true;
-    verifyBtn.textContent = 'Verifying...';
-    // perform ad injection + count
+    verifyBtn.textContent = 'Loading Gate...';
+    
+    // Perform ad injection + count
     const ok = injectAdAndCountFor(target);
     if(ok){
-      // after injection, show continue with delay (or unlock if last)
+      verifyBtn.textContent = 'Completed ✅';
+      verifyBtn.classList.add('completed');
+      
+      // After injection, show continue with delay (or unlock if last)
       if(currentStep < totalSteps){
         showContinueWithDelay();
       } else {
-        // last step completed -> show unlock button
+        // Last step completed -> show unlock button
         unlockBtn.style.display = 'inline-block';
         unlockBtn.disabled = false;
+        unlockBtn.classList.add('ready');
       }
     } else {
       alert('Verification failed. Please try again.');
@@ -282,8 +341,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(next <= totalSteps){
       navigateToStep(next);
     } else {
-      // If somehow next > totalSteps, just refresh UI
-      updateUI();
+      // If somehow next > totalSteps, navigate to final step URL without step param
+      window.location.href = window.location.origin + window.location.pathname + `?target=${encodeURIComponent(target)}&steps=${req}`;
     }
   });
 
@@ -293,19 +352,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(finalState.count >= totalSteps){
       unlockLinkFor(target);
     } else {
-      alert('You have not completed all verification steps.');
+      alert('You have not completed all verification steps. Please complete the remaining steps.');
     }
   });
 
   // Reset button clears verification for this target
   resetBtn.addEventListener('click', ()=>{
-    if(confirm('Reset verification progress for this short URL?')){
+    if(confirm('Are you sure you want to reset all verification progress for this link?')){
       resetState(target);
-      // reload to reflect reset (will show verify again)
-      location.reload();
+      // Navigate back to step 1
+      navigateToStep(1);
     }
   });
-
-  // Update UI once more
-  updateUI();
 });
+    

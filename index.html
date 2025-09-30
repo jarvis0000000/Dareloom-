@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dareloom Shortener & Verify</title>
+<link rel="stylesheet" href="style.css">
+<meta name="description" content="All-in-one link shortener and verification gate.">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="logo">DV</div>
+    <div class="title">Dareloom Shortener</div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="card shortener-card">
+    <h1>Link Shortener</h1>
+    <p class="muted">Paste your long URL below to generate a short, verified link.</p>
+    
+    <div class="shorten-form">
+      <input type="url" id="longUrlInput" placeholder="Enter your full URL here (e.g., https://t.me/yourchannel)">
+      <button id="shortenBtn" class="btn primary">Generate Verified Link</button>
+    </div>
+    
+    <div id="resultContainer" class="result-container" style="display: none;">
+      <p>Your Verified URL:</p>
+      <input type="text" id="shortUrlOutput" readonly>
+      <button id="copyBtn" class="btn alt">Copy Link</button>
+    </div>
+  </section>
+  
+  <hr class="divider">
+
+  <section class="card verification-card">
+    <h1>Complete verification to continue</h1>
+    <p class="muted">You'll complete <strong>one step at a time</strong>. After verifying a step, wait 10 seconds and click <strong>Continue</strong> to move to the next step. Total required: <span id="requiredStepsLabel">3</span>.</p>
+
+    <div id="single-step" class="single-step">
+      <div class="step-card">
+        <strong id="stepTitle">Step 1</strong>
+        <p id="stepDesc" class="muted">Click <strong>Verify</strong> to perform the verification for this step.</p>
+        <div class="step-actions">
+          <button id="verifyBtn" class="btn primary">Verify</button>
+          <button id="continueBtn" class="btn alt" disabled style="display:none;">Continue</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress">
+      <div id="bar" class="bar"><div id="fill" class="fill"></div></div>
+      <div id="status">0 / 3 completed</div>
+    </div>
+
+    <div class="actions">
+      <button id="unlock-btn" class="btn primary" disabled style="display:none;">Unlock Link</button>
+      <button id="reset-btn" class="btn alt">Reset</button>
+    </div>
+
+    <div class="info">
+      <p><strong>Note:</strong> Verification for a short URL is valid for <strong>3 hours</strong>. After that you will be asked to verify again.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <small>Verification link format: <code>?target=ENCODED_URL</code> (optional <code>&steps=N</code>, <code>&step=1</code> to navigate step-by-step)</small>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

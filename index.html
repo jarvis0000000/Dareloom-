@@ -1,78 +1,457 @@
 <!doctype html>
-<html lang="en">
+<html lang="hi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Dareloom Link Gateway</title>
-<link rel="stylesheet" href="style.css">
-<meta name="description" content="Secure and fast link shortener with mandatory verification gate.">
-<link rel="icon" href="favicon.ico" type="image/x-icon">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dareloom Link Gateway — 3-step Verified (Ads in every step)</title>
+  <meta name="description" content="Secure link gateway with 3-step verification. Each verification page contains ad snippets (user-initiated).">
+  <style>
+    :root{--bg:#071027;--card:#0b1220;--muted:#9aa4b2;--accent:#4f46e5;--glass:rgba(255,255,255,0.03);color-scheme:dark}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#071027,#08162a);color:#e6eef8}
+    .top{display:flex;align-items:center;padding:16px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{font-size:18px;padding:6px;border-radius:8px;background:linear-gradient(90deg,#7c3aed,#06b6d4)}
+    .container{max-width:980px;margin:24px auto;display:grid;grid-template-columns:1fr 420px;gap:18px;padding:8px}
+    .card{background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .muted{color:var(--muted);font-size:13px}
+    .shorten-form{display:flex;gap:8px;margin-top:12px}
+    input[type=url],input[type=text]{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:var(--glass);color:inherit}
+    .btn{padding:10px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#06b6d4);color:#fff}
+    .btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#dfe9fb}
+    .ad-slot{margin-top:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);min-height:60px;display:flex;align-items:center;justify-content:center}
+    .progress{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.02)}
+    .bar{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden}
+    .fill{height:100%;width:0%;background:linear-gradient(90deg,#34d399,#60a5fa)}
+    .bottom-ad{position:fixed;left:12px;right:12px;bottom:12px;border-radius:10px;z-index:999;font-size:13px;padding:8px;background:linear-gradient(90deg,#071029,#082033);box-shadow:0 6px 24px rgba(2,6,23,0.6);display:flex;align-items:center;justify-content:space-between}
+    @media(max-width:960px){.container{grid-template-columns:1fr;padding:8px}}
+    code{background:rgba(255,255,255,0.02);padding:3px;border-radius:4px}
+  </style>
 </head>
 <body>
-<header class="top">
-  <div class="brand">
-    <div class="logo">🔗V</div>
-    <div class="title">Dareloom Link Gateway</div>
-  </div>
-</header>
-
-<main class="container">
-  <section class="card shortener-card">
-    <h2>Secure Link Shortener</h2>
-    <p class="muted">Paste your long URL below to generate a **secure, trackable link**.</p>
-    
-    <div class="shorten-form">
-      <input type="url" id="longUrlInput" aria-label="Enter your full URL to shorten" placeholder="Enter your full URL here (e.g., https://t.me/yourchannel)" required>
-      <button id="shortenBtn" class="btn primary">Generate Verified Link</button>
+  <header class="top">
+    <div class="brand">
+      <div class="logo">🔗V</div>
+      <div class="title">Dareloom Link Gateway</div>
     </div>
-    
-    <div id="resultContainer" class="result-container" style="display: none;">
-      <p>Your Secure Link:</p>
-      <div role="alert" aria-live="polite">
-          <input type="text" id="shortUrlOutput" readonly value="[Short URL will appear here]">
+  </header>
+
+  <main class="container" role="main">
+    <!-- Shortener + Top ad -->
+    <section class="card" aria-labelledby="shortenerHeading">
+      <h2 id="shortenerHeading">Secure Link Shortener</h2>
+      <p class="muted">Paste destination URL and generate a verified link. Client-only shortener (for production use server-side).</p>
+
+      <div class="shorten-form" aria-label="Shorten form">
+        <input id="longUrlInput" type="url" placeholder="Enter destination URL (e.g., https://t.me/yourchannel)" aria-label="Long URL">
+        <button id="shortenBtn" class="btn primary">Generate Verified Link</button>
       </div>
-      <button id="copyBtn" class="btn alt">Copy Link</button>
-    </div>
-  </section>
-  
-  <hr class="divider">
 
-  <section class="card verification-card">
-    <h2>Unlock Your Destination Link</h2>
-    <p class="muted">To ensure this is a valid request, you must complete **all verification steps** below.</p>
-
-    <div id="single-step" class="single-step">
-      <div class="step-card">
-        <strong id="stepTitle">Verification Step <span id="currentStepNum">1</span></strong>
-        <p id="stepDesc" class="muted">Click **Verify** to start the process for this step. You must complete the task on the new page.</p>
-        <div class="step-actions">
-          <button id="verifyBtn" class="btn primary">Start Verification</button>
-          <button id="continueBtn" class="btn alt" disabled style="display:none;" aria-label="Continue to the next step">Next Step</button>
+      <div id="resultContainer" style="display:none;margin-top:12px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="shortUrlOutput" type="text" readonly style="flex:1;padding:10px;border-radius:8px">
+          <button id="copyBtn" class="btn alt">Copy Link</button>
         </div>
       </div>
+
+      <div class="ad-slot" id="ad-slot-top">
+        <!-- TOP BANNER: using user scripts below within verification pages too -->
+        <div class="muted">Top banner placeholder — actual ad scripts run on verification pages (opened from Start Verification).</div>
+      </div>
+    </section>
+
+    <!-- Verification card -->
+    <section class="card" aria-labelledby="verificationHeading">
+      <h2 id="verificationHeading">Unlock Your Destination Link — 3-step Verification</h2>
+      <p class="muted">Complete all 3 steps. Har step new tab mein khulega jahan ads & social bar run honge. User clicks inside the new tab to confirm completion (this notifies main page automatically).</p>
+
+      <div style="padding:10px;background:rgba(255,255,255,0.01);border-radius:8px">
+        <strong>Step <span id="currentStepNum">1</span> of <span id="requiredStepsLabel">3</span></strong>
+        <p id="stepDesc" class="muted">Click <strong>Start Verification</strong> to open the verification page in a new tab (ads will be visible there). After completing what's required, click <strong>"I've Completed"</strong> in that tab to mark the step done.</p>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button id="verifyBtn" class="btn primary">Start Verification</button>
+          <button id="ackBtn" class="btn alt" disabled style="display:none">I've Completed (if auto notify fails)</button>
+        </div>
+      </div>
+
+      <div class="progress" style="margin-top:12px">
+        <div class="bar" aria-hidden="true"><div id="fill" class="fill"></div></div>
+        <div style="margin-top:8px"><span id="completedCount">0</span> / <span id="requiredStepsLabel2" style="display:none">3</span> steps completed</div>
+        <div class="muted" style="margin-top:6px">Expires in: <span id="expiresIn">—</span></div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button id="unlock-btn" class="btn primary" disabled>Unlock Destination Link</button>
+        <button id="reset-btn" class="btn alt">Reset</button>
+      </div>
+
+      <div class="ad-slot" id="ad-slot-native" style="margin-top:12px">
+        <!-- NATIVE/RESPONSIVE placeholder -->
+        <div class="muted">Native ad placeholder — actual ad scripts run on step pages.</div>
+      </div>
+    </section>
+  </main>
+
+  <div class="bottom-ad" id="bottomAd">
+    <div id="bottomAdInner" style="flex:1">Mobile sticky ad placeholder — actual ad snippet runs on verification pages.</div>
+    <button id="closeBottom" class="btn alt">Close</button>
+  </div>
+
+  <footer style="max-width:980px;margin:18px auto;color:#9aa4b2;padding:0 8px;font-size:13px">
+    <div>Verification link format: <code>?target=ENCODED_URL&steps=N</code></div>
+  </footer>
+
+<script>
+/* ===========================
+   CONFIG — CHANGE IF NEEDED
+   ===========================
+   POPUNDER_URL: your smartlink (user provided) — used for popunder on completion.
+   VERIFICATION_TARGETS: array of verification page targets. We'll generate step pages dynamically
+                         and inject the ad scripts you provided into each generated page.
+*/
+const POPUNDER_URL = "https://www.revenuecpmgate.com/xrw53yni?key=655b0bda2a1bea55e30eb8b0d4fafbfe";
+
+// These are the three step pages. Step 1 is your smartlink; steps 2 and 3 currently are example placeholders.
+// If you want same smartlink for all steps, set them all to POPUNDER_URL.
+const VERIFICATION_TARGETS = [
+  "https://www.revenuecpmgate.com/xrw53yni?key=655b0bda2a1bea55e30eb8b0d4fafbfe", // Step 1: smartlink
+  "https://www.revenuecpmgate.com/b95e6swf?key=0f61d8bf1a7278d5cf9f161ab55bafbb", // Step 2: another link you gave
+  "https://example.com/verify/step3" // Step 3: placeholder (replace if you have another)
+];
+
+const DEFAULT_STEPS = 3;
+const VERIFICATION_WINDOW_MS = 3 * 60 * 60 * 1000; // 3 hours
+
+/* ===========================
+   THE AD SCRIPTS YOU SENT (INJECT INTO STEP PAGES)
+   * These are injected into each generated verification page.
+   * WARNING: running third-party scripts may perform redirects or other behaviors.
+   * If you want to disable any of these, remove/comment them out here.
+   =========================== */
+
+const USER_AD_SNIPPETS = `
+
+<!-- user snippet 1: atOptions / highperformanceformat -->
+<script type="text/javascript">
+  atOptions = {
+    'key' : 'd1be46ed95d3e2db572824c531da5082',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/d1be46ed95d3e2db572824c531da5082/invoke.js"></script>
+
+<!-- user snippet 2: revenuecpmgate script 1 -->
+<script type='text/javascript' src='//pl27626803.revenuecpmgate.com/24/e4/33/24e43300238cf9b86a05c918e6b00561.js'></script>
+
+<!-- user snippet 3: direct smartlink target (if you want embedded link or iframe; note: may redirect) -->
+<!-- We'll show it as a clickable button / iframe option -->
+<!-- raw smartlink: https://www.revenuecpmgate.com/b95e6swf?key=0f61d8bf1a7278d5cf9f161ab55bafbb -->
+
+<!-- user snippet 4: another revenuecpmgate script -->
+<script type='text/javascript' src='//pl27654958.revenuecpmgate.com/cb/63/19/cb6319838ced4608354b54fc6faddb8a.js'></script>
+
+<!-- Note: You also provided https://www.revenuecpmgate.com/xrw53yni?key=... which is used as POPUNDER_URL/step1 -->
+`;
+
+/* ===========================
+   UI refs
+   =========================== */
+const longInput = document.getElementById('longUrlInput');
+const shortenBtn = document.getElementById('shortenBtn');
+const resultContainer = document.getElementById('resultContainer');
+const shortOutput = document.getElementById('shortUrlOutput');
+const copyBtn = document.getElementById('copyBtn');
+
+const verifyBtn = document.getElementById('verifyBtn');
+const ackBtn = document.getElementById('ackBtn');
+const currentStepNum = document.getElementById('currentStepNum');
+const completedCountEl = document.getElementById('completedCount');
+const fillEl = document.getElementById('fill'); // may be null if not present visually
+const unlockBtn = document.getElementById('unlock-btn');
+const resetBtn = document.getElementById('reset-btn');
+const expiresInEl = document.getElementById('expiresIn');
+const closeBottom = document.getElementById('closeBottom');
+
+let requiredSteps = parseInt(getQuery('steps')) || parseInt(sessionStorage.getItem('d_steps')) || DEFAULT_STEPS;
+requiredSteps = isNaN(requiredSteps) ? DEFAULT_STEPS : requiredSteps;
+document.getElementById('requiredStepsLabel').textContent = requiredSteps;
+
+let currentStep = parseInt(getQuery('step')) || 1;
+currentStepNum.textContent = currentStep;
+
+/* -------------------------
+   Helpers
+   ------------------------- */
+function getQuery(name, url = location.search){ name = name.replace(/[\\[\\]]/g,'\\\\$&'); const r = new RegExp('[?&]'+name+'=([^&]*)').exec(url); return r? decodeURIComponent(r[1]) : null; }
+function nowTs(){ return Date.now(); }
+function formatDuration(ms){ if(ms<=0) return "expired"; const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60; return \`\${h}h \${m}m \${sec}s\`; }
+
+/* -------------------------
+   Shortener (client-only)
+   ------------------------- */
+function generateShortLink(longUrl, steps){
+  const enc = encodeURIComponent(longUrl);
+  const ts = nowTs();
+  return \`\${location.origin}\${location.pathname}?target=\${enc}&steps=\${steps}&ts=\${ts}\`;
+}
+shortenBtn.addEventListener('click', ()=>{
+  const long = (longInput.value || "").trim();
+  if(!long){ alert("Please enter a valid URL."); return; }
+  let steps = parseInt(prompt("How many verification steps? (1-5)", String(requiredSteps)) || String(requiredSteps), 10);
+  if(isNaN(steps) || steps<1) steps = DEFAULT_STEPS;
+  if(steps>5) steps = 5;
+  const short = generateShortLink(long, steps);
+  shortOutput.value = short;
+  resultContainer.style.display = 'block';
+  // persist session
+  sessionStorage.setItem('d_target', long);
+  sessionStorage.setItem('d_steps', steps);
+  sessionStorage.setItem('d_ts', nowTs());
+  // prepare verification targets for this session: if you want to force using VERIFICATION_TARGETS, keep as is; otherwise you could map differently
+  sessionStorage.setItem('d_targets', JSON.stringify(VERIFICATION_TARGETS.slice(0,steps)));
+  initVerificationState();
+});
+copyBtn.addEventListener('click', async ()=>{
+  try{ await navigator.clipboard.writeText(shortOutput.value); copyBtn.textContent="Copied!"; setTimeout(()=>copyBtn.textContent="Copy Link",1200); }catch(e){ alert("Copy failed — copy manually."); }
+});
+
+/* -------------------------
+   Verification state init
+   ------------------------- */
+function initVerificationState(){
+  const startTs = parseInt(sessionStorage.getItem('d_ts')) || nowTs();
+  const storedSteps = parseInt(sessionStorage.getItem('d_steps')) || requiredSteps;
+  requiredSteps = storedSteps;
+  document.getElementById('requiredStepsLabel').textContent = requiredSteps;
+
+  let completed = JSON.parse(sessionStorage.getItem('d_completed') || "[]");
+  if(!Array.isArray(completed)) completed = [];
+  updateProgressUI(completed.length, requiredSteps);
+
+  const expiresAt = startTs + VERIFICATION_WINDOW_MS;
+  updateExpiryTimer(expiresAt);
+}
+function updateExpiryTimer(expiresAt){
+  const remaining = expiresAt - nowTs();
+  if(remaining <= 0){
+    expiresInEl.textContent = "expired — regenerate link";
+    verifyBtn.disabled = true;
+    ackBtn.disabled = true;
+    unlockBtn.disabled = true;
+    return;
+  }
+  expiresInEl.textContent = formatDuration(remaining);
+  setTimeout(()=>updateExpiryTimer(expiresAt), 1000);
+}
+function updateProgressUI(completedCount, required){
+  completedCountEl.textContent = completedCount;
+  const pct = Math.round((completedCount/required)*100);
+  if(fillEl) fillEl.style.width = pct + "%";
+  if(completedCount >= required) unlockBtn.disabled = false; else unlockBtn.disabled = true;
+}
+
+/* -------------------------
+   Message from child (verification page) handler
+   ------------------------- */
+window.addEventListener('message', (ev)=>{
+  // Only accept messages from child windows we opened in this session.
+  try{
+    const data = ev.data || {};
+    if(data && data.__dareloom_verification && typeof data.step === 'number'){
+      markStepCompleted(data.step);
+    }
+  }catch(e){}
+}, false);
+
+/* -------------------------
+   Start Verification: open dynamically created page (blob) that includes ads & a "I've Completed" button
+   - We create a HTML string with the ad snippets inserted.
+   - The verification page will postMessage back to opener on completion, then close itself.
+   ------------------------- */
+verifyBtn.addEventListener('click', ()=>{
+  // get or set targets
+  let targets = JSON.parse(sessionStorage.getItem('d_targets') || "null");
+  if(!Array.isArray(targets) || targets.length < 1){
+    targets = VERIFICATION_TARGETS.slice(0, requiredSteps);
+    sessionStorage.setItem('d_targets', JSON.stringify(targets));
+  }
+  const index = Math.max(0, currentStep - 1);
+  const target = targets[index] || targets[0];
+
+  // build verification page HTML (as blob) — inject the user scripts & show the main target as clickable element
+  const verificationHtml = buildVerificationPageHtml(currentStep, target, USER_AD_SNIPPETS);
+  const blob = new Blob([verificationHtml], { type: 'text/html' });
+  const blobUrl = URL.createObjectURL(blob);
+
+  // open the verification page in a new tab (user-initiated)
+  const childWin = window.open(blobUrl, '_blank', 'noopener');
+
+  // fallback: show manual ack button on main page if messaging blocked
+  ackBtn.style.display = 'inline-block';
+  ackBtn.disabled = false;
+
+  // release object URL after some time to avoid memory leak
+  setTimeout(()=>{ try{ URL.revokeObjectURL(blobUrl);}catch(e){} }, 60*1000);
+});
+
+/* If user clicks ack on main page (manual)
+   sometimes postMessage may be blocked (rare), so allow manual ack.
+*/
+ackBtn.addEventListener('click', ()=>{
+  ackBtn.disabled = true;
+  ackBtn.style.display = 'none';
+  markStepCompleted(currentStep);
+});
+
+/* Mark step completed (called from message or manual ack) */
+function markStepCompleted(stepNum){
+  const completed = JSON.parse(sessionStorage.getItem('d_completed') || "[]");
+  if(!Array.isArray(completed)) completed = [];
+  if(!completed.includes(stepNum)) completed.push(stepNum);
+  sessionStorage.setItem('d_completed', JSON.stringify(completed));
+  updateProgressUI(completed.length, requiredSteps);
+
+  // open a popunder (user-initiated equivalent) — attempt, but browsers may block
+  try{
+    const w = window.open(POPUNDER_URL, 'popunder_'+Date.now(), 'width=800,height=600,toolbar=0,location=0,menubar=0');
+    if(w){ try{ window.focus(); }catch(e){} }
+  }catch(e){ console.warn("popunder failed", e); }
+
+  // advance to next step if any
+  if(stepNum < requiredSteps){
+    currentStep = stepNum + 1;
+    currentStepNum.textContent = currentStep;
+    const newUrl = new URL(location.href);
+    newUrl.searchParams.set('step', currentStep);
+    history.replaceState(null, '', newUrl.toString());
+  }
+}
+
+/* Unlock final destination */
+unlockBtn.addEventListener('click', ()=>{
+  const completed = JSON.parse(sessionStorage.getItem('d_completed') || "[]");
+  if(completed.length < requiredSteps){ alert("Please complete all verification steps first."); return; }
+  const target = sessionStorage.getItem('d_target') || getQuery('target') || '';
+  if(!target){ alert("No destination found. Generate a link first."); return; }
+  if(confirm("Open destination now?")){ window.open(target, '_blank', 'noopener'); }
+});
+
+/* Reset */
+resetBtn.addEventListener('click', ()=>{
+  if(!confirm("Reset progress & clear session data?")) return;
+  sessionStorage.removeItem('d_target');
+  sessionStorage.removeItem('d_steps');
+  sessionStorage.removeItem('d_ts');
+  sessionStorage.removeItem('d_completed');
+  sessionStorage.removeItem('d_targets');
+  location.href = location.pathname;
+});
+
+/* Load from query param if present */
+(function init(){
+  const urlTarget = getQuery('target');
+  const urlSteps = parseInt(getQuery('steps')) || null;
+  const urlTs = parseInt(getQuery('ts')) || null;
+  if(urlTarget){
+    const decoded = decodeURIComponent(urlTarget);
+    sessionStorage.setItem('d_target', decoded);
+    if(urlSteps) sessionStorage.setItem('d_steps', urlSteps);
+    if(urlTs) sessionStorage.setItem('d_ts', urlTs);
+    shortOutput.value = location.href;
+    resultContainer.style.display = 'block';
+  }
+  initVerificationState();
+})();
+
+/* Close bottom ad */
+closeBottom.addEventListener('click', ()=>{ document.getElementById('bottomAd').style.display='none'; });
+
+/* -------------------------
+   Utility: build verification page HTML (string)
+   - This will include: the ad snippets, a visible clickable link to the target (so user can click),
+     and a big "I've Completed" button which will postMessage to opener and close the tab.
+   - We avoid auto-redirects. User must click to interact.
+   ------------------------- */
+function buildVerificationPageHtml(stepNumber, targetUrl, adSnippetsHtml){
+  // sanitize minimal: ensure targetUrl is string
+  const safeTarget = String(targetUrl || '').replace(/"/g, '&quot;');
+  // Present the ad snippets and a friendly UI
+  const html = `
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verification Step ${stepNumber}</title>
+<style>
+  body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:#071027;color:#e6eef8;margin:0;padding:18px}
+  .box{max-width:920px;margin:0 auto;background:#081428;padding:18px;border-radius:12px}
+  a.btn{display:inline-block;padding:12px 16px;border-radius:8px;background:#4f46e5;color:white;text-decoration:none;font-weight:700;margin-right:8px}
+  button{padding:10px 12px;border-radius:8px;border:0;background:#06b6d4;color:#042;cursor:pointer;font-weight:700}
+  .muted{color:#9aa4b2}
+  .ad{margin:14px 0;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);min-height:90px;display:flex;align-items:center;justify-content:center}
+  .note{margin-top:12px;color:#9aa4b2;font-size:13px}
+</style>
+</head>
+<body>
+  <div class="box">
+    <h2>Verification — Step ${stepNumber}</h2>
+    <p class="muted">A required verification page. Please interact with the content below. When finished, click <strong>"I've Completed"</strong>.</p>
+
+    <!-- AD SNIPPETS INJECTED HERE -->
+    <div class="ad" id="ad-area">
+      ${adSnippetsHtml}
     </div>
 
-    <div class="progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="3" id="progressBarContainer">
-      <div id="bar" class="bar"><div id="fill" class="fill"></div></div>
-      <div id="status"><span id="completedCount">0</span> / <span id="requiredStepsLabel">3</span> steps completed</div>
+    <!-- clickable destination (helps engagement) -->
+    <p style="margin-top:12px">Open the destination or offer (optional): <a class="btn" href="${safeTarget}" target="_blank" rel="noopener">Open Offer</a></p>
+
+    <div style="margin-top:18px">
+      <button id="completeBtn">I've Completed — Return</button>
+      <button id="closeBtn" style="margin-left:8px;background:#222;color:#fff" onclick="window.close()">Close</button>
     </div>
 
-    <div class="actions">
-      <button id="unlock-btn" class="btn primary large-btn" disabled style="display:none;">Unlock Destination Link</button>
-      <button id="reset-btn" class="btn alt">Reset Verification</button>
-    </div>
+    <p class="note">Note: This page was opened by the verification gateway. After you click "I've Completed", this tab will notify the gateway and close. Popunders may open as part of verification (user-initiated).</p>
+  </div>
 
-    <div class="info">
-      <p><strong>Note:</strong> Verification is a time-sensitive process and is valid for **3 hours**. After this period, you will be required to verify again to access the link.</p>
-    </div>
-  </section>
-</main>
-
-<footer class="foot">
-  <small>URL Gateway powered by Dareloom | <a href="#">Terms of Service</a></small>
-  <small class="debug-info">Verification link format: <code>?target=ENCODED_URL</code> (optional <code>&steps=N</code>, <code>&step=1</code> to navigate step-by-step)</small>
-</footer>
-
-<script src="script.js"></script>
+<script>
+  // When user clicks Complete, post message to opener and close.
+  document.getElementById('completeBtn').addEventListener('click', function(){
+    try{
+      if(window.opener && !window.opener.closed){
+        window.opener.postMessage({ __dareloom_verification: true, step: ${stepNumber}, origin: location.origin }, '*');
+      }
+    }catch(e){}
+    // close self (some browsers may block close; in that case instruct user)
+    try{ window.close(); }catch(e){}
+    // fallback: show instruction if window didn't close
+    setTimeout(function(){
+      var doc = document.body;
+      var msg = document.createElement('div');
+      msg.style.marginTop = '12px';
+      msg.style.color = '#9aa4b2';
+      msg.innerText = "If this tab did not close automatically, please close it and return to the gateway.";
+      doc.appendChild(msg);
+    }, 500);
+  });
+</script>
 </body>
 </html>
+  `;
+  return html;
+}
+
+/* ===========================
+   FINAL WARNING (short)
+   - Third-party ad scripts can redirect or perform behaviors that may annoy users.
+   - Test thoroughly on a staging domain before going live.
+   - If you want any of the user snippets removed or changed to placeholders, tell me and I'll edit instantly.
+   =========================== */
+</script>
+</body>
+</html>
+
+    

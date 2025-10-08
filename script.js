@@ -5,6 +5,14 @@ const DEFAULT_REQUIRED_STEPS = 3;
 const VERIFICATION_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours
 const STORAGE_PREFIX = "dareloom_verify_v2_"; // per-target storage
 
+// --- ADDED FOR BETTER CTR/CPL CONVERSION ---
+const STEP_DESCRIPTIONS = [
+    "Step 1: Click 'Verify' to load the content gate and view the sponsor's message for a few seconds.",
+    "Step 2: Complete the quick security check presented in the new window to proceed.",
+    "Step 3: One final validation! Click 'Verify' to confirm access and prepare to unlock the link."
+];
+// ------------------------------------------
+
 // Elements
 const E = {
   longUrlInput: document.getElementById('longUrlInput'),
@@ -63,6 +71,10 @@ function readState(target){
     
     // Check for expiration immediately on read
     if (isExpired(state)) {
+        // --- UPDATED: Alert user if progress is reset due to expiry ---
+        if(state.count > 0){
+            alert("Verification time expired! Progress has been reset (3 hours limit). Please start from Step 1.");
+        }
         resetState(target, false); // Reset in storage but don't force UI update yet
         return {count:0, startedAt:0};
     }
@@ -240,7 +252,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   
   updateUI(); // Initial UI update based on stored state
 
-  // Setup social bar script for verification pages
+  // Setup social bar script for verification pages (for impressions/clicks)
   const socialScript = document.createElement('script');
   socialScript.type = 'text/javascript';
   socialScript.src = SOCIAL_BAR_SCRIPT;
@@ -252,7 +264,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const stepLabel = `Step ${currentStep}`;
   if(E.stepTitle) E.stepTitle.textContent = stepLabel;
   if(E.currentStepNum) E.currentStepNum.textContent = currentStep;
-  if(E.stepDesc) E.stepDesc.textContent = `You must complete the task for ${stepLabel} to continue.`;
+  
+  // --- UPDATED: Use descriptive text for better engagement (CPL/CTR) ---
+  const customDesc = STEP_DESCRIPTIONS[currentStep - 1] || `You must complete the task for ${stepLabel} to continue.`;
+  if(E.stepDesc) E.stepDesc.textContent = customDesc;
 
   // Get current state
   const curState = readState(target);
@@ -365,4 +380,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   });
 });
-    
+  

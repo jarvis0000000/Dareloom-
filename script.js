@@ -1,8 +1,9 @@
-// Updated verification flow: single step per page, time-limited (3 hours), reset when target changes.
+// Updated verification flow: single step per page, time-limited (1 hour), reset when target changes.
 const AD_SCRIPT = "//pl27626803.revenuecpmgate.com/24/e4/33/24e43300238cf9b86a05c918e6b00561.js";
 const SOCIAL_BAR_SCRIPT = "//pl27654958.revenuecpmgate.com/cb/63/19/cb6319838ced4608354b54fc6faddb8a.js";
 const DEFAULT_REQUIRED_STEPS = 3;
-const VERIFICATION_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours
+// --- CHANGE: 1 hour (1 * 60 * 60 * 1000) ---
+const VERIFICATION_TTL_MS = 1 * 60 * 60 * 1000; // 1 hour 
 const STORAGE_PREFIX = "dareloom_verify_v2_"; // per-target storage
 
 // --- ADDED FOR BETTER CTR/CPL CONVERSION ---
@@ -71,10 +72,10 @@ function readState(target){
     
     // Check for expiration immediately on read
     if (isExpired(state)) {
-        // --- UPDATED: Alert user if progress is reset due to expiry ---
-        if(state.count > 0){
-            alert("Verification time expired! Progress has been reset (3 hours limit). Please start from Step 1.");
-        }
+        // --- UPDATED: Removed alert to keep UX smooth (reset is silent) ---
+        // if(state.count > 0){
+        //     alert("Verification time expired! Progress has been reset (1 hour limit). Please start from Step 1.");
+        // }
         resetState(target, false); // Reset in storage but don't force UI update yet
         return {count:0, startedAt:0};
     }
@@ -166,6 +167,7 @@ function injectAdAndCountFor(target){
   
   // 1. Open blank popup to improve popunder chance (may be blocked by browser)
   let popup = null;
+  // Opening the popup here ensures that the ad script uses the new tab/window for redirection.
   try{ popup = window.open('about:blank', '_blank', 'noopener'); }catch(e){ popup = null; }
   
   // 2. Inject Ad Script
@@ -185,9 +187,10 @@ function injectAdAndCountFor(target){
     writeState(target, state);
   }
   
-  // 4. Close popup (The ad script usually redirects this blank page)
+  // 4. Close popup (The ad script usually redirects this blank page) - Best to keep this if the ad network expects it
   if(popup && !popup.closed){
-    try{ popup.close(); }catch(e){} // Browser security might prevent this
+    // We try to close it, allowing the ad script injected by the popunder to take over the 'about:blank' page.
+    try{ setTimeout(() => popup.close(), 100); }catch(e){} // Added a slight delay for safety
   }
   
   updateUI();
@@ -344,6 +347,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         unlockBtn.classList.add('ready');
       }
     } else {
+      // Show failure message if injectAdAndCountFor returns false
       alert('Verification failed. Please try again.');
       verifyBtn.disabled = false;
       verifyBtn.textContent = 'Verify';
@@ -357,7 +361,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
       navigateToStep(next);
     } else {
       // If somehow next > totalSteps, navigate to final step URL without step param
-      window.location.href = window.location.origin + window.location.pathname + `?target=${encodeURIComponent(target)}&steps=${req}`;
+      const url = new URL(window.location.href);
+      url.searchParams.delete('step');
+      window.location.href = url.toString();
     }
   });
 
@@ -380,4 +386,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   });
 });
-  
+    

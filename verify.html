@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verification Step - Dareloom</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="verify-container">
+    <h1>⚡ Verification Required</h1>
+    <p>Please complete the step below to access your link.</p>
+
+    <!-- Ad Slot 1: Adsterra -->
+    <div class="ad-slot" id="adsterra-slot">
+      <!-- Adsterra Social Bar -->
+      <script type='text/javascript' src='//pl25652763.profitablegatetocontent.com/f1/b5/61/f1b5612d8cfb01b903bfa5081ab419d5.js'></script>
+      <!-- Adsterra Native Banner -->
+      <script type='text/javascript' src='//pl25653211.profitablegatetocontent.com/b7/28/ca/b728ca7b59a9f9a86801eb5a793e420e.js'></script>
+    </div>
+
+    <div class="timer-box">
+      <p>Wait <span id="countdown">10</span> seconds...</p>
+    </div>
+
+    <!-- Ad Slot 2: Propeller Ads -->
+    <div class="ad-slot" id="propeller-slot">
+      <!-- Propeller Direct -->
+      <script data-cfasync="false" async type="text/javascript" src="//achcdn.com/tag.min.js" data-zone="8892068"></script>
+      <!-- Propeller Onclick -->
+      <script async data-cfasync="false" src="//upgulpinon.com/1?z=8892107"></script>
+    </div>
+
+    <button id="getLinkBtn" disabled>Verifying...</button>
+  </div>
+
+  <script>
+    const btn = document.getElementById('getLinkBtn');
+    const countdown = document.getElementById('countdown');
+
+    // Extract target URL
+    const params = new URLSearchParams(window.location.search);
+    const target = params.get('target');
+
+    if(!target){
+      document.body.innerHTML = "<h2>Invalid link</h2>";
+    } else {
+      let timeLeft = 10;
+      const timer = setInterval(()=>{
+        timeLeft--;
+        countdown.textContent = timeLeft;
+        if(timeLeft <= 0){
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.textContent = "✅ Get Link";
+          btn.classList.add("active");
+        }
+      },1000);
+    }
+
+    btn.addEventListener('click', ()=>{
+      if(!target) return;
+      btn.textContent = "Redirecting...";
+      setTimeout(()=>{ window.open(decodeURIComponent(target), "_blank"); }, 1000);
+    });
+  </script>
+</body>
+</html>

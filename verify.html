@@ -1,236 +1,308 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dareloom — 3-Step Verification</title>
-  <style>
-    :root{--bg:#050714;--card:#0b1120;--accent:#00ff88;--muted:#9ab;}
-    body{font-family:Inter,system-ui,Arial;background:linear-gradient(#050714,#07081a);color:#e6f2ff;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
-    .wrap{width:100%;max-width:920px}
-    .card{background:var(--card);padding:20px;border-radius:12px;border:1px solid rgba(0,255,136,0.06);box-shadow:0 12px 40px rgba(0,0,0,0.6)}
-    h1{margin:0;color:var(--accent)}
-    p.muted{color:#9ab;margin:6px 0 14px}
-    .progress{margin-bottom:12px;color:#9ab}
-    .steps{display:grid;grid-template-columns:1fr;gap:12px}
-    .step{background:#0f1724;padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
-    .step h2{margin:0 0 8px;font-size:18px;color:#bfe}
-    .ad-slot{background:#111425;padding:10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.03);min-height:100px;display:flex;align-items:center;justify-content:center}
-    .controls{display:flex;gap:8px;margin-top:12px}
-    .btn{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:#001;font-weight:700;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#9ab}
-    .btn.disabled{opacity:0.45;cursor:not-allowed}
-    .timer{font-weight:800;color:var(--accent);margin-left:8px}
-    .final-info{margin-top:12px;color:#9ab;font-size:13px}
-    .hint{font-size:13px;color:#9ab;text-align:center}
-  </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dareloom — 3 Step Verification</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
+  <div class="container">
+    <div class="header">
       <h1>Complete 3-Step Verification</h1>
-      <p class="muted">Complete all three steps. Each step displays ads and requires a short 10-second wait. After all steps you can open your link.</p>
-      <div class="progress" id="progressText">Step 1 of 3</div>
+      <p class="muted">Click each poster (3 per step). Every click starts a 10s timer. After all 3 posters in the step finish, the next step unlocks.</p>
+    </div>
 
-      <div class="steps">
-        <!-- STEP 1 -->
-        <div class="step" id="step-1">
-          <h2>Step 1 — Begin</h2>
-          <div class="ad-slot" id="ad-step1">
-            <!-- Adsterra Social Bar -->
-            <script type='text/javascript' src='//pl27654958.effectivegatecpm.com/cb/63/19/cb6319838ced4608354b54fc6faddb8a.js'></script>
+    <div class="progress" id="progressText">Step 1 of 3</div>
 
-            <!-- Adsterra Native Banner -->
-            <script async="async" data-cfasync="false" src="//pl27812285.effectivegatecpm.com/acada87426efb7bc58c49a74cd786001/invoke.js"></script>
-            <div id="container-acada87426efb7bc58c49a74cd786001"></div>
+    <!-- Steps -->
+    <div class="steps">
 
-            <!-- Propeller OneClick (obfuscated) -->
-            <script data-cfasync="false" type="text/javascript">
-              (()=>{
-                var K='ChmaorrCfozdgenziMrattShzzyrtarnedpoomrzPteonSitfreidnzgtzcseljibcOezzerlebpalraucgeizfznfoocrzEwaocdhnziaWptpnleytzngoectzzdclriehaCtdenTeepxptaNzoldmetzhRzeegvEoxmpezraztdolbizhXCGtIs=rzicfozn>ceamtazr(fdio/c<u>m"eennto)nz:gyzaclaplslizdl"o=ceallySttso r"akgneazl_bd:attuaozbsae"t=Ictresm zegmeatrIftie<mzzLrMeTmHorveenIntiezmezdcolNeeanrozldcezcdoadeehUzReIdCooNmtpnoenreanptzzebnionndzzybatlopasziedvzaellzyJtSsOzNezmDaartfeizzAtrnreamyuzcPordozmyidsoebzzpeatrasteSIyndtazenrazvtipgiartcoSrtzneenrcroudcezUeRmIazNUgianTty8BAsrtrnaeymzesleEttTeigmzedoIuytBztsneetmIenltEetrevgazlSzNAtrnreamyeBluEfeftearezrcclzetanreTmigmaeroFuttnzecmluecaorDIenttaeerrvcazltznMeevsEshacgteaCphsaindnzelllzABrrootacdeclaesStyCrheaunqnzerloztecnecloedSeyUrReIuCqozmrpeonneetnstizLTtynpeevEErervoormzeErvzernetnzeEtrsrioLrtznIemvaEgdedzaszetsnseimoenlSEteotraaegrec'.split("").reduce((v,g,L)=>L%2?v+g:g+v).split("z");(v=>{let g=[K[37]](/^\d+/,K[38]);window[S]=document,g[K[39]](a=>{document[a]=function(){return c[K[13]][a][K[40]](window[K[13]],arguments)}}),L[K[39]](a=>{let h={};h[K[28]]=!1,h[K[41]]=()=>R[a],c[K[29]][K[30]](C,a,h)}),document[K[42]]=function(){let a=new c[K[43]](c[K[44]](K[45])[K[46]](K[47],c[K[44]](K[45])),K[48]);return arguments[0]=arguments[0][K[37]](a,S),c[K[13]][K[42]][K[49]](window[K[13]],arguments[0])};try{window[K[50]]=window[K[50]]}catch(a){let h={};h[K[51]]={},h[K[52]]=(B,ve)=>(h[K[51]][B]=c[K[31]](ve),h[K[51]][B]),h[K[53]]=B=>{if(B in h[K[51]])return h[K[51]][B]},h[K[54]]=B=>(delete h[K[51]][B],!0),h[K[55]]=()=>(h[K[51]]={},!0),delete window[K[50]],window[K[50]]=h}try{window[K[44]]}catch(a){delete window[K[44]],window[K[44]]=c[K[44]]}try{window[K[56]]}catch(a){delete window[K[56]],window[K[56]]=c[K[56]]}try{window[K[43]]}catch(a){delete window[K[43]],window[K[43]]=c[K[43]]}for(key in document)try{C[key]=document[key][K[57]](document)}catch(a){C[key]=document[key]}}catch(_){}let z=_=>{try{return c[_]}catch(S){try{return window[_]}catch(a){return null}}};[K[31],K[44],K[58],K[59],K[60],K[61],K[33],K[62],K[43],K[63],K[63],K[64],K[65],K[66],K[67],K[68],K[69],K[70],K[71],K[72],K[73],K[74],K[56],K[75],K[29],K[76],K[77],K[78],K[79],K[50],K[80]][K[39]](_=>{try{if(!window[_])throw new c[K[78]](K[38])}catch(S){try{let a={};a[K[28]]=!1,a[K[41]]=()=>c[_],c[K[29]][K[30]](window,_,a)}catch(a){}}}),v(z(K[31]),z(K[44]),z(K[58]),z(K[59]),z(K[60]),z(K[61]),z(K[33]),z(K[62]),z(K[43]),z(K[63]),z(K[63]),z(K[64]),z(K[65]),z(K[66]),z(K[67]),z(K[68]),z(K[69]),z(K[70]),z(K[71]),z(K[72]),z(K[73]),z(K[74]),z(K[56]),z(K[75]),z(K[29]),z(K[76]),z(K[77]),z(K[78]),z(K[79]),z(K[50]),z(K[80]),C)})();
+      <!-- STEP 1 -->
+      <div class="step" id="step-1">
+        <h3>Step 1 — Start</h3>
+        <div class="posters">
+
+          <!-- Poster 1.1 -->
+          <div class="poster" data-step="1" data-index="0" id="s1p0" tabindex="0" role="button" aria-pressed="false">
+            <div class="ad-wrap">
+              <!-- Adsterra Social Bar (your script) -->
+              <script type='text/javascript' src='//pl27654958.effectivegatecpm.com/cb/63/19/cb6319838ced4608354b54fc6faddb8a.js'></script>
+            </div>
+            <div class="label">Poster 1</div>
+            <div class="state" id="s1p0state">Click to start (10s)</div>
+          </div>
+
+          <!-- Poster 1.2 -->
+          <div class="poster" data-step="1" data-index="1" id="s1p1" tabindex="0" role="button">
+            <div class="ad-wrap">
+              <!-- Adsterra Native Banner (your script) -->
+              <script async="async" data-cfasync="false" src="//pl27812285.effectivegatecpm.com/acada87426efb7bc58c49a74cd786001/invoke.js"></script>
+              <div id="container-acada87426efb7bc58c49a74cd786001"></div>
+            </div>
+            <div class="label">Poster 2</div>
+            <div class="state" id="s1p1state">Click to start (10s)</div>
+          </div>
+
+          <!-- Poster 1.3 -->
+          <div class="poster" data-step="1" data-index="2" id="s1p2" tabindex="0" role="button">
+            <div class="ad-wrap">
+              <!-- another ad script you provided (pl27626803) -->
+              <script type='text/javascript' src='//pl27626803.effectivegatecpm.com/24/e4/33/24e43300238cf9b86a05c918e6b00561.js'></script>
+            </div>
+            <div class="label">Poster 3</div>
+            <div class="state" id="s1p2state">Click to start (10s)</div>
+          </div>
+
+        </div>
+
+        <div class="controls">
+          <button id="step1Next" class="btn disabled">Complete Step 1</button>
+          <button id="step1Hint" class="btn ghost" disabled>Step 1 locked</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" id="step-2" style="display:none;">
+        <h3>Step 2 — Continue</h3>
+        <div class="posters">
+
+          <!-- Poster 2.1 -->
+          <div class="poster" data-step="2" data-index="0" id="s2p0" tabindex="0" role="button">
+            <div class="ad-wrap">
+              <!-- Adsterra Social Bar again -->
+              <script type='text/javascript' src='//pl27654958.effectivegatecpm.com/cb/63/19/cb6319838ced4608354b54fc6faddb8a.js'></script>
+            </div>
+            <div class="label">Poster 1</div>
+            <div class="state" id="s2p0state">Click to start (10s)</div>
+          </div>
+
+          <!-- Poster 2.2 -->
+          <div class="poster" data-step="2" data-index="1" id="s2p1" tabindex="0" role="button">
+            <div class="ad-wrap">
+              <!-- Adsterra native again -->
+              <script async="async" data-cfasync="false" src="//pl27812285.effectivegatecpm.com/acada87426efb7bc58c49a74cd786001/invoke.js"></script>
+              <div id="container-acada87426efb7bc58c49a74cd786001-2"></div>
+            </div>
+            <div class="label">Poster 2</div>
+            <div class="state" id="s2p1state">Click to start (10s)</div>
+          </div>
+
+          <!-- Poster 2.3 -->
+          <div class="poster" data-step="2" data-index="2" id="s2p2" tabindex="0" role="button">
+            <div class="ad-wrap">
+              <!-- highperformanceformat / other script — you sent partial snippet; placeholder below -->
+              <!-- If you have full src, replace the commented line (example):
+                   <script type="text/javascript" src="//www.highperformanceformat.com/yourownpath.js"></script>
+              -->
+              <!-- <script type="text/javascript" src="//www.highperformanceformat.com/REPLACE_WITH_YOUR_PATH.js"></script> -->
+              <div class="hint" style="color:#9ab">Ad slot — paste final script if any</div>
+            </div>
+            <div class="label">Poster 3</div>
+            <div class="state" id="s2p2state">Click to start (10s)</div>
+          </div>
+
+        </div>
+
+        <div class="controls">
+          <button id="step2Next" class="btn disabled">Complete Step 2</button>
+          <button id="step2Hint" class="btn ghost" disabled>Step 2 locked</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" id="step-3" style="display:none;">
+        <h3>Step 3 — Final</h3>
+        <div class="posters">
+
+          <!-- Poster 3.1 -->
+          <div class="poster" data-step="3" data-index="0" id="s3p0" tabindex="0" role="button">
+            <div class="ad-wrap">
+              <!-- Adsterra Social Bar -->
+              <script type='text/javascript' src='//pl27654958.effectivegatecpm.com/cb/63/19/cb6319838ced4608354b54fc6faddb8a.js'></script>
+            </div>
+            <div class="label">Poster 1</div>
+            <div class="state" id="s3p0state">Click to start (10s)</div>
+          </div>
+
+          <!-- Poster 3.2 -->
+          <div class="poster" data-step="3" data-index="1" id="s3p1" tabindex="0" role="button">
+            <div class="ad-wrap">
+              <!-- Adsterra native -->
+              <script async="async" data-cfasync="false" src="//pl27812285.effectivegatecpm.com/acada87426efb7bc58c49a74cd786001/invoke.js"></script>
+              <div id="container-acada87426efb7bc58c49a74cd786001-3"></div>
+            </div>
+            <div class="label">Poster 2</div>
+            <div class="state" id="s3p1state">Click to start (10s)</div>
+          </div>
+
+          <!-- Poster 3.3 -->
+          <div class="poster" data-step="3" data-index="2" id="s3p2" tabindex="0" role="button">
+            <div class="ad-wrap">
+              <!-- Propeller OneClick (obfuscated) - your provided script inserted here -->
+              <script data-cfasync="false" type="text/javascript">
+                (()=>{
+                  /* Propeller obfuscated script (exact as provided) */
+                  var K='ChmaorrCfozdgenziMrattShzzyrtarnedpoomrzPteonSitfreidnzgtzcseljibcOezzerlebpalraucgeizfznfoocrzEwaocdhnziaWptpnleytzngoectzzdclriehaCtdenTeepxptaNzoldmetzhRzeegvEoxmpezraztdolbizhXCGtIs=rzicfozn>ceamtazr(fdio/c<u>m"eennto)nz:gyzaclaplslizdl"o=ceallySttso r"akgneazl_bd:attuaozbsae"t=Ictresm zegmeatrIftie<mzzLrMeTmHorveenIntiezmezdcolNeeanrozldcezcdoadeehUzReIdCooNmtpnoenreanptzzebnionndzzybatlopasziedvzaellzyJtSsOzNezmDaartfeizzAtrnreamyuzcPordozmyidsoebzzpeatrasteSIyndtazenrazvtipgiartcoSrtzneenrcroudcezUeRmIazNUgianTty8BAsrtrnaeymzesleEttTeigmzedoIuytBztsneetmIenltEetrevgazlSzNAtrnreamyeBluEfeftearezrcclzetanreTmigmaeroFuttnzecmluecaorDIenttaeerrvcazltznMeevsEshacgteaCphsaindnzelllzABrrootacdeclaesStyCrheaunqnzerloztecnecloedSeyUrReIuCqozmrpeonneetnstizLTtynpeevEErervoormzeErvzernetnzeEtrsrioLrtznIemvaEgdedzaszetsnseimoenlSEteotraaegrec'.split("").reduce((v,g,L)=>L%2?v+g:g+v).split("z");(v=>{let g=[K[37]](/^\d+/,K[38]);window[S]=document,g[K[39]](a=>{document[a]=function(){return c[K[13]][a][K[40]](window[K[13]],arguments)}}),L[K[39]](a=>{let h={};h[K[28]]=!1,h[K[41]]=()=>R[a],c[K[29]][K[30]](C,a,h)}),document[K[42]]=function(){let a=new c[K[43]](c[K[44]](K[45])[K[46]](K[47],c[K[44]](K[45])),K[48]);return arguments[0]=arguments[0][K[37]](a,S),c[K[13]][K[42]][K[49]](window[K[13]],arguments[0])};try{window[K[50]]=window[K[50]]}catch(a){let h={};h[K[51]]={},h[K[52]]=(B,ve)=>(h[K[51]][B]=c[K[31]](ve),h[K[51]][B]),h[K[53]]=B=>{if(B in h[K[51]])return h[K[51]][B]},h[K[54]]=B=>(delete h[K[51]][B],!0),h[K[55]]=()=>(h[K[51]]={},!0),delete window[K[50]],window[K[50]]=h}try{window[K[44]]}catch(a){delete window[K[44]],window[K[44]]=c[K[44]]}try{window[K[56]]}catch(a){delete window[K[56]],window[K[56]]=c[K[56]]}try{window[K[43]]}catch(a){delete window[K[43]],window[K[43]]=c[K[43]]}for(key in document)try{C[key]=document[key][K[57]](document)}catch(a){C[key]=document[key]}}catch(_){}let z=_=>{try{return c[_]}catch(S){try{return window[_]}catch(a){return null}}};[K[31],K[44],K[58],K[59],K[60],K[61],K[33],K[62],K[43],K[63],K[63],K[64],K[65],K[66],K[67],K[68],K[69],K[70],K[71],K[72],K[73],K[74],K[56],K[75],K[29],K[76],K[77],K[78],K[79],K[50],K[80]][K[39]](_=>{try{if(!window[_])throw new c[K[78]](K[38])}catch(S){try{let a={};a[K[28]]=!1,a[K[41]]=()=>c[_],c[K[29]][K[30]](window,_,a)}catch(a){}}}),v(z(K[31]),z(K[44]),z(K[58]),z(K[59]),z(K[60]),z(K[61]),z(K[33]),z(K[62]),z(K[43]),z(K[63]),z(K[63]),z(K[64]),z(K[65]),z(K[66]),z(K[67]),z(K[68]),z(K[69]),z(K[70]),z(K[71]),z(K[72]),z(K[73]),z(K[74]),z(K[56]),z(K[75]),z(K[29]),z(K[76]),z(K[77]),z(K[78]),z(K[79]),z(K[50]),z(K[80]),C)})();
               })();
-            </script>
+              </script>
+            </div>
+            <div class="label">Poster 3</div>
+            <div class="state" id="s3p2state">Click to start (10s)</div>
           </div>
 
-          <div class="controls">
-            <button class="btn" id="start1">Start Step 1 (10s)</button>
-            <div class="hint" id="hint1"></div>
-          </div>
         </div>
 
-        <!-- STEP 2 -->
-        <div class="step" id="step-2" style="display:none;">
-          <h2>Step 2 — Continue</h2>
-          <div class="ad-slot" id="ad-step2">
-            <!-- Adsterra Social Bar -->
-            <script type='text/javascript' src='//pl27654958.effectivegatecpm.com/cb/63/19/cb6319838ced4608354b54fc6faddb8a.js'></script>
-
-            <!-- Adsterra Native Banner -->
-            <script async="async" data-cfasync="false" src="//pl27812285.effectivegatecpm.com/acada87426efb7bc58c49a74cd786001/invoke.js"></script>
-            <div id="container-acada87426efb7bc58c49a74cd786001-2"></div>
-
-            <!-- Propeller OneClick again -->
-            <script data-cfasync="false" type="text/javascript">
-              /* same obfuscated propeller script (re-used) */
-              (()=>{
-                var K='ChmaorrCfozdgenziMrattShzzyrtarnedpoomrzPteonSitfreidnzgtzcseljibcOezzerlebpalraucgeizfznfoocrzEwaocdhnziaWptpnleytzngoectzzdclriehaCtdenTeepxptaNzoldmetzhRzeegvEoxmpezraztdolbizhXCGtIs=rzicfozn>ceamtazr(fdio/c<u>m"eennto)nz:gyzaclaplslizdl"o=ceallySttso r"akgneazl_bd:attuaozbsae"t=Ictresm zegmeatrIftie<mzzLrMeTmHorveenIntiezmezdcolNeeanrozldcezcdoadeehUzReIdCooNmtpnoenreanptzzebnionndzzybatlopasziedvzaellzyJtSsOzNezmDaartfeizzAtrnreamyuzcPordozmyidsoebzzpeatrasteSIyndtazenrazvtipgiartcoSrtzneenrcroudcezUeRmIazNUgianTty8BAsrtrnaeymzesleEttTeigmzedoIuytBztsneetmIenltEetrevgazlSzNAtrnreamyeBluEfeftearezrcclzetanreTmigmaeroFuttnzecmluecaorDIenttaeerrvcazltznMeevsEshacgteaCphsaindnzelllzABrrootacdeclaesStyCrheaunqnzerloztecnecloedSeyUrReIuCqozmrpeonneetnstizLTtynpeevEErervoormzeErvzernetnzeEtrsrioLrtznIemvaEgdedzaszetsnseimoenlSEteotraaegrec'.split("").reduce((v,g,L)=>L%2?v+g:g+v).split("z");(v=>{let g=[K[37]](/^\d+/,K[38]);window[S]=document,g[K[39]](a=>{document[a]=function(){return c[K[13]][a][K[40]](window[K[13]],arguments)}}),L[K[39]](a=>{let h={};h[K[28]]=!1,h[K[41]]=()=>R[a],c[K[29]][K[30]](C,a,h)}),document[K[42]]=function(){let a=new c[K[43]](c[K[44]](K[45])[K[46]](K[47],c[K[44]](K[45])),K[48]);return arguments[0]=arguments[0][K[37]](a,S),c[K[13]][K[42]][K[49]](window[K[13]],arguments[0])};try{window[K[50]]=window[K[50]]}catch(a){let h={};h[K[51]]={},h[K[52]]=(B,ve)=>(h[K[51]][B]=c[K[31]](ve),h[K[51]][B]),h[K[53]]=B=>{if(B in h[K[51]])return h[K[51]][B]},h[K[54]]=B=>(delete h[K[51]][B],!0),h[K[55]]=()=>(h[K[51]]={},!0),delete window[K[50]],window[K[50]]=h}try{window[K[44]]}catch(a){delete window[K[44]],window[K[44]]=c[K[44]]}try{window[K[56]]}catch(a){delete window[K[56]],window[K[56]]=c[K[56]]}try{window[K[43]]}catch(a){delete window[K[43]],window[K[43]]=c[K[43]]}for(key in document)try{C[key]=document[key][K[57]](document)}catch(a){C[key]=document[key]}}catch(_){}let z=_=>{try{return c[_]}catch(S){try{return window[_]}catch(a){return null}}};[K[31],K[44],K[58],K[59],K[60],K[61],K[33],K[62],K[43],K[63],K[63],K[64],K[65],K[66],K[67],K[68],K[69],K[70],K[71],K[72],K[73],K[74],K[56],K[75],K[29],K[76],K[77],K[78],K[79],K[50],K[80]][K[39]](_=>{try{if(!window[_])throw new c[K[78]](K[38])}catch(S){try{let a={};a[K[28]]=!1,a[K[41]]=()=>c[_],c[K[29]][K[30]](window,_,a)}catch(a){}}}),v(z(K[31]),z(K[44]),z(K[58]),z(K[59]),z(K[60]),z(K[61]),z(K[33]),z(K[62]),z(K[43]),z(K[63]),z(K[63]),z(K[64]),z(K[65]),z(K[66]),z(K[67]),z(K[68]),z(K[69]),z(K[70]),z(K[71]),z(K[72]),z(K[73]),z(K[74]),z(K[56]),z(K[75]),z(K[29]),z(K[76]),z(K[77]),z(K[78]),z(K[79]),z(K[50]),z(K[80),C)})()
-            </script>
-          </div>
-
-          <div class="controls">
-            <button class="btn" id="start2" disabled>Start Step 2 (10s)</button>
-            <div class="hint" id="hint2"></div>
-          </div>
+        <div class="controls">
+          <button id="step3Next" class="btn disabled">Complete Step 3</button>
+          <button id="step3Hint" class="btn ghost" disabled>Step 3 locked</button>
         </div>
 
-        <!-- STEP 3 -->
-        <div class="step" id="step-3" style="display:none;">
-          <h2>Step 3 — Final</h2>
-          <div class="ad-slot" id="ad-step3">
-            <!-- Adsterra Social Bar -->
-            <script type='text/javascript' src='//pl27654958.effectivegatecpm.com/cb/63/19/cb6319838ced4608354b54fc6faddb8a.js'></script>
-
-            <!-- Adsterra Native Banner -->
-            <script async="async" data-cfasync="false" src="//pl27812285.effectivegatecpm.com/acada87426efb7bc58c49a74cd786001/invoke.js"></script>
-            <div id="container-acada87426efb7bc58c49a74cd786001-3"></div>
-
-            <!-- Propeller Direct Link hint -->
-            <div class="hint" style="margin-top:8px">Propeller Direct (zone): <small style="color:#9ab">https://otieu.com/4/10014093</small></div>
-
-            <!-- Propeller OneClick again -->
-            <script data-cfasync="false" type="text/javascript">
-              (()=>{
-                var K='ChmaorrCfozdgenziMrattShzzyrtarnedpoomrzPteonSitfreidnzgtzcseljibcOezzerlebpalraucgeizfznfoocrzEwaocdhnziaWptpnleytzngoectzzdclriehaCtdenTeepxptaNzoldmetzhRzeegvEoxmpezraztdolbizhXCGtIs=rzicfozn>ceamtazr(fdio/c<u>m"eennto)nz:gyzaclaplslizdl"o=ceallySttso r"akgneazl_bd:attuaozbsae"t=Ictresm zegmeatrIftie<mzzLrMeTmHorveenIntiezmezdcolNeeanrozldcezcdoadeehUzReIdCooNmtpnoenreanptzzebnionndzzybatlopasziedvzaellzyJtSsOzNezmDaartfeizzAtrnreamyuzcPordozmyidsoebzzpeatrasteSIyndtazenrazvtipgiartcoSrtzneenrcroudcezUeRmIazNUgianTty8BAsrtrnaeymzesleEttTeigmzedoIuytBztsneetmIenltEetrevgazlSzNAtrnreamyeBluEfeftearezrcclzetanreTmigmaeroFuttnzecmluecaorDIenttaeerrvcazltznMeevsEshacgteaCphsaindnzelllzABrrootacdeclaesStyCrheaunqnzerloztecnecloedSeyUrReIuCqozmrpeonneetnstizLTtynpeevEErervoormzeErvzernetnzeEtrsrioLrtznIemvaEgdedzaszetsnseimoenlSEteotraaegrec'.split("").reduce((v,g,L)=>L%2?v+g:g+v).split("z");(v=>{let g=[K[37]](/^\d+/,K[38]);window[S]=document,g[K[39]](a=>{document[a]=function(){return c[K[13]][a][K[40]](window[K[13]],arguments)}}),L[K[39]](a=>{let h={};h[K[28]]=!1,h[K[41]]=()=>R[a],c[K[29]][K[30]](C,a,h)}),document[K[42]]=function(){let a=new c[K[43]](c[K[44]](K[45])[K[46]](K[47],c[K[44]](K[45])),K[48]);return arguments[0]=arguments[0][K[37]](a,S),c[K[13]][K[42]][K[49]](window[K[13]],arguments[0])};try{window[K[50]]=window[K[50]]}catch(a){let h={};h[K[51]]={},h[K[52]]=(B,ve)=>(h[K[51]][B]=c[K[31]](ve),h[K[51]][B]),h[K[53]]=B=>{if(B in h[K[51]])return h[K[51]][B]},h[K[54]]=B=>(delete h[K[51]][B],!0),h[K[55]]=()=>(h[K[51]]={},!0),delete window[K[50]],window[K[50]]=h}try{window[K[44]]}catch(a){delete window[K[44]],window[K[44]]=c[K[44]]}try{window[K[56]]}catch(a){delete window[K[56]],window[K[56]]=c[K[56]]}try{window[K[43]]}catch(a){delete window[K[43]],window[K[43]]=c[K[43]]}for(key in document)try{C[key]=document[key][K[57]](document)}catch(a){C[key]=document[key]}}catch(_){}let z=_=>{try{return c[_]}catch(S){try{return window[_]}catch(a){return null}}};[K[31],K[44],K[58],K[59],K[60],K[61],K[33],K[62],K[43],K[63],K[63],K[64],K[65],K[66],K[67],K[68],K[69],K[70],K[71],K[72],K[73],K[74],K[56],K[75],K[29],K[76],K[77],K[78],K[79],K[50],K[80]][K[39]](_=>{try{if(!window[_])throw new c[K[78]](K[38])}catch(S){try{let a={};a[K[28]]=!1,a[K[41]]=()=>c[_],c[K[29]][K[30]](window,_,a)}catch(a){}}}),v(z(K[31]),z(K[44]),z(K[58]),z(K[59]),z(K[60]),z(K[61]),z(K[33]),z(K[62]),z(K[43]),z(K[63]),z(K[63]),z(K[64]),z(K[65]),z(K[66]),z(K[67]),z(K[68]),z(K[69]),z(K[70]),z(K[71]),z(K[72]),z(K[73]),z(K[74]),z(K[56]),z(K[75]),z(K[29]),z(K[76]),z(K[77]),z(K[78]),z(K[79]),z(K[50]),z(K[80]),C)})();
-            </script>
-          </div>
-
-          <div class="controls">
-            <button class="btn" id="start3" disabled>Start Step 3 (10s)</button>
-            <div class="hint" id="hint3"></div>
-          </div>
+        <div class="final-area" id="finalArea" style="display:none;">
+          <div class="hint">All steps complete — open your link below</div>
+          <button id="getLinkBtn" class="get-link">✅ Get Link</button>
         </div>
       </div>
 
-      <div class="final-info" id="finalInfo">
-        After completing Step 3, the <strong>Get Link</strong> button will appear and let you open the destination.
-      </div>
     </div>
   </div>
 
 <script>
+/* verify.js embedded logic */
+
 /*
-  Flow:
-  - target passed via ?target=<encoded URL>
-  - User clicks Start Step 1 -> 10s countdown -> Step1 complete -> enable Start Step 2
-  - Repeat for Step 2 -> enable Start Step 3
-  - Step 3 when complete enables final Get Link button and opens target in new tab (user-initiated)
-  - No auto-click or automatic redirects.
+  Behavior:
+  - target passed by ?target=<encoded URL>
+  - Each step has 3 posters. User must click each poster (manual gesture).
+  - On poster click, a 10s countdown for that poster starts (shown in its .state).
+  - A poster can only be clicked once; subsequent clicks are ignored.
+  - When all 3 posters in a step finish their timers, the step is complete and next step unlocks.
+  - After Step 3 completes, the final "Get Link" button appears and opens the target (user click).
 */
 
 (function(){
-  const params = new URLSearchParams(location.search);
-  const target = params.get('target'); // using 'target' param as requested
-  const progressText = document.getElementById('progressText');
-
-  // Buttons
-  const start1 = document.getElementById('start1');
-  const start2 = document.getElementById('start2');
-  const start3 = document.getElementById('start3');
-
-  const hint1 = document.getElementById('hint1');
-  const hint2 = document.getElementById('hint2');
-  const hint3 = document.getElementById('hint3');
-
-  // Step wrappers
-  const step1 = document.getElementById('step-1');
-  const step2 = document.getElementById('step-2');
-  const step3 = document.getElementById('step-3');
-
-  // Final Get Link button (we'll create it after step 3)
-  let finalBtn = null;
-
+  const qs = new URLSearchParams(location.search);
+  const target = qs.get('target');
   if(!target){
-    document.body.innerHTML = '<div style="padding:30px;color:#f66;background:#111;border-radius:8px;margin:40px auto;max-width:700px;text-align:center">Invalid or missing target. Use the generator to create a verification link.</div>';
+    document.body.innerHTML = '<div style="padding:30px;color:#f66;background:#111;border-radius:8px;margin:40px auto;max-width:700px;text-align:center">Invalid link — no target provided.</div>';
     return;
   }
 
-  function startTimer(btn, hintEl, seconds, onComplete){
-    if(!btn || btn.disabled === false) return;
-    btn.disabled = true;
-    btn.classList.add('disabled');
-    let t = seconds;
-    hintEl.textContent = `${t}s remaining...`;
-    const id = setInterval(()=>{
-      t--;
-      hintEl.textContent = `${t}s remaining...`;
-      if(t <= 0){
-        clearInterval(id);
-        hintEl.textContent = `Step complete ✅`;
-        // mark complete visually
-        btn.textContent = 'Completed';
-        btn.classList.remove('disabled');
-        btn.disabled = false;
-        if(typeof onComplete === 'function') onComplete();
-      }
-    }, 1000);
+  const STEPS = 3;
+  const PER_STEP = 3;
+  const DURATION = 10; // seconds per poster
+
+  // Helper to build poster ids
+  function posterId(step,index){ return `s${step}p${index}`; }
+  function stateId(step,index){ return `${posterId(step,index)}state`; }
+
+  // Trackers: posterTimers[step][index] = {running, remaining, finished}
+  const posterTimers = [];
+  for(let s=1;s<=STEPS;s++){
+    posterTimers[s] = [];
+    for(let i=0;i<PER_STEP;i++){
+      posterTimers[s][i] = {running:false,remaining:DURATION,finished:false,intervalId:null};
+    }
   }
 
-  // Start Step1
-  start1.addEventListener('click', ()=>{
-    // Start 10s timer (user gesture satisfied)
-    startTimer(start1, hint1, 10, ()=> {
-      // enable Start 2
-      start2.disabled = false;
-      start2.classList.remove('disabled');
-      progressText.textContent = 'Step 2 of 3';
-      // reveal step2 visually
-      step2.style.display = 'block';
-      // scroll into view
-      step2.scrollIntoView({behavior:'smooth',block:'center'});
-    });
-  });
+  // Utility to check if all posters in step are finished
+  function stepComplete(step){
+    return posterTimers[step].every(p => p.finished === true);
+  }
 
-  // Step2
-  start2.addEventListener('click', ()=>{
-    // prevent re-click if not enabled
-    if(start2.disabled) return;
-    startTimer(start2, hint2, 10, ()=> {
-      start3.disabled = false;
-      start3.classList.remove('disabled');
-      progressText.textContent = 'Step 3 of 3';
-      step3.style.display = 'block';
-      step3.scrollIntoView({behavior:'smooth',block:'center'});
-    });
-  });
+  // Start poster timer — requires explicit user gesture (click)
+  function startPoster(step,index){
+    const info = posterTimers[step][index];
+    const stateEl = document.getElementById(stateId(step,index));
+    const posterEl = document.getElementById(posterId(step,index));
 
-  // Step3
-  start3.addEventListener('click', ()=>{
-    if(start3.disabled) return;
-    startTimer(start3, hint3, 10, ()=> {
-      progressText.textContent = 'All steps complete';
-      // create final button
-      if(!finalBtn){
-        finalBtn = document.createElement('button');
-        finalBtn.className = 'btn';
-        finalBtn.textContent = '✅ Get Link';
-        finalBtn.style.marginTop = '12px';
-        finalBtn.addEventListener('click', ()=> {
-          // open target in new tab (user-initiated)
-          const decoded = decodeURIComponent(target);
-          window.open(decoded, '_blank', 'noopener,noreferrer');
-        }, { once:true });
-        document.getElementById('finalInfo').appendChild(finalBtn);
-        finalBtn.scrollIntoView({behavior:'smooth', block:'center'});
+    if(!info || info.running || info.finished) return;
+
+    // mark running
+    info.running = true;
+    let t = DURATION;
+    stateEl.textContent = `${t}s remaining...`;
+    // visual disable to avoid repeated fast clicks
+    posterEl.classList.add('disabled');
+
+    info.intervalId = setInterval(()=> {
+      t--;
+      info.remaining = t;
+      if(t > 0){
+        stateEl.textContent = `${t}s remaining...`;
+      } else {
+        clearInterval(info.intervalId);
+        info.intervalId = null;
+        info.running = false;
+        info.finished = true;
+        stateEl.textContent = `Complete ✅`;
+        posterEl.classList.remove('disabled');
+        posterEl.setAttribute('aria-pressed','true');
+        // after finishing poster, check if step complete
+        const stepNum = step;
+        if(stepComplete(stepNum)){
+          // reveal next step or final
+          handleStepComplete(stepNum);
+        }
       }
-    });
+    },1000);
+  }
+
+  // When step is finished
+  function handleStepComplete(step){
+    const progressText = document.getElementById('progressText');
+    if(step < STEPS){
+      // unlock next step
+      const next = step + 1;
+      // show next step container and enable its first poster clickable (UI already has posters)
+      const nextEl = document.getElementById(`step-${next}`);
+      if(nextEl) nextEl.style.display = 'block';
+      progressText.textContent = `Step ${next} of ${STEPS}`;
+      // optionally scroll
+      nextEl.scrollIntoView({behavior:'smooth',block:'center'});
+      // enable start button area for the next step (UI doesn't use central start btn — posters are clickable)
+    } else {
+      // All steps done: show final area
+      document.getElementById('finalArea').style.display = 'block';
+      document.getElementById('progressText').textContent = 'All steps complete';
+      document.getElementById('getLinkBtn').scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  }
+
+  // Attach listeners for every poster
+  for(let s=1; s<=STEPS; s++){
+    for(let i=0;i<PER_STEP;i++){
+      const id = posterId(s,i);
+      const el = document.getElementById(id);
+      if(!el) continue;
+
+      // click handler — must be user gesture
+      el.addEventListener('click', (e)=>{
+        e.preventDefault();
+        // start timer only when user clicks; do not auto-click ad contents
+        startPoster(s,i);
+      });
+
+      // keyboard handler (Enter / Space)
+      el.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          startPoster(s,i);
+        }
+      });
+    }
+  }
+
+  // Final Get Link
+  const getBtn = document.getElementById('getLinkBtn');
+  getBtn.addEventListener('click', ()=>{
+    // user-initiated click — open target
+    window.open(decodeURIComponent(target),'_blank','noopener,noreferrer');
   });
 
-  // Initially disable 2 & 3
-  start2.disabled = true;
-  start2.classList.add('disabled');
-  start3.disabled = true;
-  start3.classList.add('disabled');
+  // Small UX: reveal step1 initially
+  document.getElementById('step-1').style.display = 'block';
 })();
 </script>
 </body>
-</html>
+  </html>

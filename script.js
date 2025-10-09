@@ -7,7 +7,7 @@ const STORAGE_PREFIX = "dareloom_verify_v2_"; // per-target storage
 
 // Elements
 const E = {
-  // Shortener Elements (NEW/UPDATED)
+  // Shortener Elements
   shortenerContainer: document.getElementById('shortener-container'),
   longUrlInput: document.getElementById('longUrlInput'),
   shortenBtn: document.getElementById('shortenBtn'),
@@ -15,32 +15,21 @@ const E = {
   shortUrlOutput: document.getElementById('shortUrlOutput'),
   copyBtn: document.getElementById('copyBtn'),
   
-  // Verification Elements (Mapping to simple HTML)
-  verificationUI: document.querySelector('.verification-ui'),
-  verifyBar: document.getElementById('floating-verify-bar'), // This is the main click area
-  unlockBtn: document.getElementById('final-unlock-btn'), // Unlock button
-  
-  // UNUSED ELEMENTS from old 3-step flow (kept for reference, but won't be used with this HTML)
-  // stepTitle: document.getElementById('stepTitle'),
-  // stepDesc: document.getElementById('stepDesc'),
-  // currentStepNum: document.getElementById('currentStepNum'),
-  // completedCount: document.getElementById('completedCount'),
-  // progressBarFill: document.getElementById('fill'),
-  // progressBarContainer: document.getElementById('progressBarContainer'),
-  // statusText: document.getElementById('status'),
-  // resetBtn: document.getElementById('reset-btn'), 
-  // requiredStepsLabel: document.getElementById('requiredStepsLabel'),
-  // continueBtn: document.getElementById('continueBtn'),
+  // Verification Elements
+  verificationUI: document.querySelector('#verification-ui'), // Corrected selector for ID
+  verifyBar: document.getElementById('floating-verify-bar'),
+  unlockBtn: document.getElementById('unlock-btn'), // Corrected to 'unlock-btn' based on HTML ID
   
   // Simple HTML Timer/Instruction elements
   timerText: document.getElementById('timer-text'),
   timerCount: document.getElementById('timer-count'),
   instructionStep1: document.getElementById('instruction-step-1'),
   instructionStep2: document.getElementById('instruction-step-2'),
-  adSpace1: document.getElementById('ad-space-1')
+  adSpace1: document.getElementById('ad-space-1'),
+  targetLinkDisplay: document.getElementById('target-link-display') // Added to show target link
 };
 
-/* --- Storage and State Management (Unchanged logic) --- */
+/* --- Storage and State Management --- */
 
 function encodeKey(target){
   return STORAGE_PREFIX + btoa(target);
@@ -52,7 +41,6 @@ function getRequiredSteps() {
     const stepsParam = parseInt(url.searchParams.get('steps'), 10);
     if (Number.isInteger(stepsParam) && stepsParam >= 1 && stepsParam <= 5) return stepsParam;
   } catch(e) {}
-  // Default to 1 step for this simple HTML
   return DEFAULT_REQUIRED_STEPS;
 }
 
@@ -111,9 +99,8 @@ function shortenLink(){
   
   const encodedTarget = encodeURIComponent(normalized);
   const base = window.location.origin + window.location.pathname;
-  // Use DEFAULT_REQUIRED_STEPS (which is 1) for a simple flow
   const steps = DEFAULT_REQUIRED_STEPS; 
-  const shortUrl = `${base}?target=${encodedTarget}&steps=${steps}`; // Removed &step=1
+  const shortUrl = `${base}?target=${encodedTarget}&steps=${steps}`;
   
   E.shortUrlOutput.value = shortUrl;
   E.resultContainer.style.display = 'flex';
@@ -122,19 +109,23 @@ function shortenLink(){
 function copyLink(){
   E.shortUrlOutput.select();
   E.shortUrlOutput.setSelectionRange(0, 99999); 
-  document.execCommand('copy');
-  E.copyBtn.textContent = 'Copied! ✅';
-  setTimeout(()=>E.copyBtn.textContent='Copy Link', 2000);
+  // document.execCommand('copy'); // Deprecated, using modern API
+  navigator.clipboard.writeText(E.shortUrlOutput.value).then(() => {
+    E.copyBtn.textContent = 'Copied! ✅';
+    setTimeout(()=>E.copyBtn.textContent='Copy Link', 2000);
+  }).catch(err => {
+    console.error('Could not copy text: ', err);
+    alert('Failed to copy link. Please copy it manually.');
+  });
 }
 
-/* --- Verification UI and Logic (Simplified) --- */
+/* --- Verification UI and Logic --- */
 
 function updateUI(){
   const target = getTargetFromURL();
   
-  // Logic to show Shortener or Verification UI
+  // Show Shortener or Verification UI
   if(!target) {
-    // Show Shortener UI
     if(E.shortenerContainer) E.shortenerContainer.style.display = 'block';
     if(E.verificationUI) E.verificationUI.style.display = 'none';
     return;
@@ -144,6 +135,9 @@ function updateUI(){
   if(E.shortenerContainer) E.shortenerContainer.style.display = 'none';
   if(E.verificationUI) E.verificationUI.style.display = 'block';
 
+  // Display the target link for user visibility (debug info)
+  if(E.targetLinkDisplay) E.targetLinkDisplay.textContent = target.length > 50 ? target.substring(0, 47) + '...' : target;
+
   const req = getRequiredSteps();
   const state = readState(target); 
   const count = state.count;
@@ -152,11 +146,19 @@ function updateUI(){
   // Control Visibility of Floating Bar and Unlock Button
   if (unlocked) {
       if(E.verifyBar) E.verifyBar.style.display = 'none';
-      if(E.unlockBtn) E.unlockBtn.style.display = 'inline-block';
+      if(E.unlockBtn) {
+        E.unlockBtn.style.display = 'inline-block';
+        E.unlockBtn.classList.add('ready'); // Add neon pulsing class
+        E.unlockBtn.textContent = 'GET YOUR LINK NOW!';
+      }
       if(E.instructionStep2) E.instructionStep2.style.display = 'block';
   } else {
       if(E.verifyBar) E.verifyBar.style.display = 'block';
-      if(E.unlockBtn) E.unlockBtn.style.display = 'none';
+      if(E.unlockBtn) {
+        E.unlockBtn.style.display = 'none';
+        E.unlockBtn.classList.remove('ready');
+        E.unlockBtn.textContent = 'Get Your Link'; // Reset text
+      }
       if(E.instructionStep2) E.instructionStep2.style.display = 'none';
   }
 }
@@ -206,9 +208,12 @@ function unlockLinkFor(target){
   const opened = window.open(target, '_blank', 'noopener,noreferrer');
   
   if(!opened){
+    // If popup is blocked, redirect the main window
     window.location.href = target;
   } else {
+      // If successful, reset state and close the current tab (optional, but good practice)
       resetState(getTargetFromURL(), false); 
+      // window.close(); // You might want to remove this if you want the user to stay on your site
   }
 }
 
@@ -241,18 +246,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
       if(E.verifyBar && !unlocked){
           E.verifyBar.addEventListener('click', ()=>{
               
-              // 1. Show Instructions/Ads (Optional: If ad network needs native clicks)
+              // 1. Show Instructions/Ads
               if(E.instructionStep1) E.instructionStep1.style.display = 'block';
               if(E.adSpace1) E.adSpace1.style.display = 'block';
 
-              // 2. Inject Ad/Count (This is the core action)
+              // 2. Inject Ad/Count (Core action)
               const ok = injectAdAndCountFor(target);
               
               if(ok){
                   E.verifyBar.textContent = 'Verification in Progress... Please Wait!';
-                  E.verifyBar.style.backgroundColor = '#f39c12'; // Change to Yellow/Orange
+                  E.verifyBar.style.backgroundColor = '#f39c12';
                   
-                  // 3. Start Timer (UX improvement for "waiting")
+                  // 3. Start Timer
                   const DELAY_SECONDS = 7;
                   if(E.timerText) E.timerText.style.display = 'block';
                   let timer = DELAY_SECONDS;
@@ -287,3 +292,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
       }
   }
 });
+                                

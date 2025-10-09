@@ -1,66 +1,121 @@
+/* === Global Reset === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
 body {
-  font-family: 'Poppins', sans-serif;
-  background: #0b0e13;
-  color: #fff;
+  background: #0d1117;
+  color: #f0f6fc;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   min-height: 100vh;
+  padding: 20px;
 }
 
-.container, .verify-container {
-  text-align: center;
-  background: #141820;
-  padding: 20px 30px;
-  border-radius: 14px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 0 20px #00ff9d33;
-}
-
-input, button {
+/* === Container === */
+.verification-box {
+  background: #161b22;
+  border: 2px solid #30363d;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+  padding: 25px;
+  max-width: 500px;
   width: 100%;
+  margin-top: 40px;
+  text-align: center;
+}
+
+/* === Header === */
+h1 {
+  color: #00ffc8;
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+}
+
+/* === Steps === */
+.step {
+  display: none;
+  margin-top: 15px;
+}
+
+.step.active {
+  display: block;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: scale(0.95);}
+  to {opacity: 1; transform: scale(1);}
+}
+
+/* === Timer === */
+.timer {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #58a6ff;
+}
+
+/* === Ads Area === */
+.ad-container {
+  background: #0c0f12;
+  border: 1px dashed #00ffc8;
+  border-radius: 8px;
   padding: 10px;
   margin-top: 10px;
-  border-radius: 6px;
-  border: none;
+  min-height: 90px;
+  overflow: hidden;
 }
 
-button {
-  background: #00ff9d;
-  color: #000;
+.ad-container iframe,
+.ad-container script {
+  width: 100%;
+}
+
+/* === Buttons === */
+.btn {
+  margin-top: 20px;
+  background: linear-gradient(90deg, #00ffc8, #007bff);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  color: #fff;
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
 }
 
-button:hover {
-  background: #00c97b;
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
 }
 
-#adsterra-slot, #propeller-slot {
-  background: #1c2230;
-  padding: 8px;
-  margin: 15px 0;
-  border-radius: 10px;
-  min-height: 90px;
+/* === Unlock Button === */
+.unlock-btn {
+  background: linear-gradient(90deg, #ff4b1f, #ff9068);
+  display: none;
 }
 
-.timer-box {
-  margin: 10px 0;
+.unlock-btn.active {
+  display: inline-block;
+  animation: pulse 1.5s infinite;
 }
 
-#getLinkBtn:disabled {
-  background: #444;
-  color: #aaa;
-  cursor: not-allowed;
+@keyframes pulse {
+  0% { box-shadow: 0 0 10px rgba(255, 144, 104, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(255, 144, 104, 0.8); }
+  100% { box-shadow: 0 0 10px rgba(255, 144, 104, 0.4); }
 }
 
-#getLinkBtn.active {
-  animation: glow 1s infinite alternate;
-}
-
-@keyframes glow {
-  from { box-shadow: 0 0 10px #00ff9d; }
-  to { box-shadow: 0 0 20px #00ff9d; }
+/* === Footer === */
+.footer {
+  margin-top: 50px;
+  color: #8b949e;
+  font-size: 0.85rem;
+  text-align: center;
 }

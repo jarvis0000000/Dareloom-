@@ -1,68 +1,95 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Dareloom - Shortener</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dareloom — Shortener</title>
+  <style>
+    /* आपके द्वारा दिया गया Shortener CSS */
+    :root{--bg:#050714;--card:#0b1120;--accent:#00ff88;--muted:#9ab;}
+    body{font-family:Inter,system-ui,Arial;background:linear-gradient(#050714,#07081a);color:#e6f2ff;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{width:100%;max-width:760px;background:var(--card);padding:22px;border-radius:12px;border:1px solid rgba(0,255,136,0.06);box-shadow:0 12px 40px rgba(0,0,0,0.6)}
+    h1{margin:0 0 8px;color:var(--accent)}
+    p.small{color:var(--muted);margin:0 0 18px}
+    .row{display:flex;gap:10px}
+    input[type="url"]{flex:1;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#0d1222;color:#e6f2ff}
+    button{padding:12px 14px;border-radius:8px;border:0;background:var(--accent);color:#001;font-weight:700;cursor:pointer; transition: background 0.2s, transform 0.2s;}
+    button:hover{background: #33ffaa;}
+    #result{display:none;margin-top:14px;background:#071227;padding:12px;border-radius:8px;border:1px dashed rgba(0,255,136,0.06)}
+    #shortLink{width:100%;padding:10px;border-radius:6px;border:1px solid rgba(0,255,136,0.08);background:#0d1222;color:#00ff88}
+    .actions{display:flex;gap:8px;margin-top:8px}
+    .note{margin-top:12px;color:var(--muted);font-size:13px}
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>🔗 Dareloom Shortener</h1>
-      <p>Generate verification link — visitors complete 3-step verification to reach the target.</p>
+  <div class="card">
+    <h1>🔗 Dareloom Shortener</h1>
+    <p class="small">Paste your final/destination URL below and click <strong>Generate</strong>. Share the verification link.</p>
+
+    <div class="row">
+      <input id="longUrl" type="url" placeholder="https://example.com/yourfile.zip" />
+      <button id="genBtn">Generate</button>
     </div>
 
-    <div style="display:flex;gap:10px;align-items:center">
-      <input id="longUrl" type="url" placeholder="https://example.com/your-file.zip" style="flex:1;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#07101a;color:#e6f2ff"/>
-      <button id="gen" class="btn">Generate</button>
-    </div>
-
-    <div id="out" style="display:none;margin-top:12px;">
-      <div style="color:#9ab;font-size:13px">Share this verification link:</div>
-      <input id="short" readonly style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:#08121a;border:1px solid rgba(0,255,136,0.03);color:#00ffb3"/>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="copy" class="btn ghost">Copy</button>
-        <button id="open" class="btn ghost">Open (test)</button>
+    <div id="result">
+      <div style="font-size:13px;color:#9ab">Verification link (share this):</div>
+      <input id="shortLink" readonly />
+      <div class="actions">
+        <button id="copyBtn">Copy</button>
+        <button id="testBtn">Open Verify (test)</button>
       </div>
+    </div>
+
+    <div class="note">
+      Note: This shortener creates links pointing to <strong>verify.html</strong> on the same domain.
     </div>
   </div>
 
 <script>
 (function(){
-  const gen = document.getElementById('gen');
-  const long = document.getElementById('longUrl');
-  const out = document.getElementById('out');
-  const short = document.getElementById('short');
-  const copy = document.getElementById('copy');
-  const openBtn = document.getElementById('open');
+  const genBtn = document.getElementById('genBtn');
+  const longUrl = document.getElementById('longUrl');
+  const result = document.getElementById('result');
+  const shortLink = document.getElementById('shortLink');
+  const copyBtn = document.getElementById('copyBtn');
+  const testBtn = document.getElementById('testBtn');
 
-  gen.addEventListener('click', ()=> {
-    let v = long.value.trim();
-    if(!v) return alert('Enter a URL');
+  genBtn.addEventListener('click', () => {
+    let v = longUrl.value.trim();
+    if(!v) return alert('Enter a valid URL');
+
+    // Normalize and Validate URL
     if(!/^https?:\/\//i.test(v)) v = 'https://' + v;
-    try { new URL(v); } catch(e){ return alert('Invalid URL'); }
+    try { new URL(v); } catch(e){ return alert('Invalid URL format'); }
+
     const encoded = encodeURIComponent(v);
-    const base = window.location.origin + window.location.pathname.replace(/[^/]*$/,'');
-    const verifyUrl = `${base}verify.html?target=${encoded}`;
-    short.value = verifyUrl;
-    out.style.display = 'block';
+    
+    // Use the absolute path to verify.html in the root
+    const base = window.location.origin;
+    // The link must point directly to /verify.html, NOT index.html
+    const verifyUrl = `${base}/verify.html?target=${encoded}`;
+
+    shortLink.value = verifyUrl;
+    result.style.display = 'block';
   });
 
-  copy.addEventListener('click', ()=> {
-    if(!short.value) return;
-    navigator.clipboard.writeText(short.value).then(()=> {
-      copy.textContent = 'Copied!';
-      setTimeout(()=>copy.textContent = 'Copy',1400);
+  copyBtn.addEventListener('click', () => {
+    if(!shortLink.value) return;
+    navigator.clipboard?.writeText(shortLink.value).then(()=> {
+      copyBtn.textContent = 'Copied!';
+      setTimeout(()=> copyBtn.textContent = 'Copy', 1400);
     }).catch(()=> {
-      short.select();
+      // Fallback for older browsers
+      shortLink.select();
       document.execCommand('copy');
+      copyBtn.textContent = 'Copied!';
+      setTimeout(()=> copyBtn.textContent = 'Copy', 1400);
     });
   });
 
-  openBtn.addEventListener('click', ()=> {
-    if(!short.value) return alert('Generate first');
-    window.open(short.value,'_blank');
+  testBtn.addEventListener('click', () => {
+    if(!shortLink.value) return alert('Generate first');
+    window.open(shortLink.value, '_blank');
   });
 })();
 </script>

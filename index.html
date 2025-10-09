@@ -1,41 +1,92 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dareloom Link Shortener</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dareloom — Shortener</title>
+  <style>
+    :root{--bg:#050714;--card:#0b1120;--accent:#00ff88;--muted:#9ab;}
+    body{font-family:Inter,system-ui,Arial;background:linear-gradient(#050714,#07081a);color:#e6f2ff;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{width:100%;max-width:760px;background:var(--card);padding:22px;border-radius:12px;border:1px solid rgba(0,255,136,0.06);box-shadow:0 12px 40px rgba(0,0,0,0.6)}
+    h1{margin:0 0 8px;color:var(--accent)}
+    p.small{color:var(--muted);margin:0 0 18px}
+    .row{display:flex;gap:10px}
+    input[type="url"]{flex:1;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#0d1222;color:#e6f2ff}
+    button{padding:12px 14px;border-radius:8px;border:0;background:var(--accent);color:#001;font-weight:700;cursor:pointer}
+    #result{display:none;margin-top:14px;background:#071227;padding:12px;border-radius:8px;border:1px dashed rgba(0,255,136,0.06)}
+    #shortLink{width:100%;padding:10px;border-radius:6px;border:1px solid rgba(0,255,136,0.08);background:#0d1222;color:#00ff88}
+    .actions{display:flex;gap:8px;margin-top:8px}
+    .note{margin-top:12px;color:var(--muted);font-size:13px}
+  </style>
 </head>
 <body>
-  <div class="container">
+  <div class="card">
     <h1>🔗 Dareloom Shortener</h1>
-    <input type="text" id="longUrlInput" placeholder="Enter your URL..." />
-    <button id="shortenBtn">Generate Link</button>
+    <p class="small">Paste your final/destination URL below and click <strong>Generate</strong>. Share the verification link (visitors will complete 3-step verification with visible ads).</p>
 
-    <div id="resultContainer" style="display:none;">
-      <input type="text" id="shortUrlOutput" readonly />
-      <button id="copyBtn">Copy</button>
+    <div class="row">
+      <input id="longUrl" type="url" placeholder="https://example.com/yourfile.zip" />
+      <button id="genBtn">Generate</button>
+    </div>
+
+    <div id="result">
+      <div style="font-size:13px;color:#9ab">Verification link (share this):</div>
+      <input id="shortLink" readonly />
+      <div class="actions">
+        <button id="copyBtn">Copy</button>
+        <button id="testBtn">Open Verify (test)</button>
+      </div>
+    </div>
+
+    <div class="note">
+      Note: This is a static (client-side) shortener — the link encodes the destination in the query string. For production, consider a server-backed mapping.
     </div>
   </div>
 
-  <script>
-    document.getElementById('shortenBtn').addEventListener('click', ()=>{
-      const input = document.getElementById('longUrlInput').value.trim();
-      if(!input) return alert("Enter valid URL");
+<script>
+(function(){
+  const genBtn = document.getElementById('genBtn');
+  const longUrl = document.getElementById('longUrl');
+  const result = document.getElementById('result');
+  const shortLink = document.getElementById('shortLink');
+  const copyBtn = document.getElementById('copyBtn');
+  const testBtn = document.getElementById('testBtn');
 
-      const validUrl = input.startsWith('http') ? input : 'https://' + input;
-      const encoded = encodeURIComponent(validUrl);
-      const verifyUrl = `${window.location.origin}/verify.html?target=${encoded}`;
-      
-      document.getElementById('shortUrlOutput').value = verifyUrl;
-      document.getElementById('resultContainer').style.display = 'block';
-    });
+  genBtn.addEventListener('click', () => {
+    let v = longUrl.value.trim();
+    if(!v) return alert('Enter a valid URL');
 
-    document.getElementById('copyBtn').addEventListener('click', ()=>{
-      const field = document.getElementById('shortUrlOutput');
-      navigator.clipboard.writeText(field.value);
-      alert('Copied!');
+    // Normalize
+    if(!/^https?:\/\//i.test(v)) v = 'https://' + v;
+    try { new URL(v); } catch(e){ return alert('Invalid URL format'); }
+
+    const encoded = encodeURIComponent(v);
+    // Build verify path relative to origin
+    const base = window.location.origin + window.location.pathname.replace(/[^\/]*$/, '');
+    const verifyUrl = `${base}verify.html?target=${encoded}`;
+
+    shortLink.value = verifyUrl;
+    result.style.display = 'block';
+  });
+
+  copyBtn.addEventListener('click', () => {
+    if(!shortLink.value) return;
+    navigator.clipboard?.writeText(shortLink.value).then(()=> {
+      copyBtn.textContent = 'Copied!';
+      setTimeout(()=> copyBtn.textContent = 'Copy', 1400);
+    }).catch(()=> {
+      shortLink.select();
+      document.execCommand('copy');
+      copyBtn.textContent = 'Copied!';
+      setTimeout(()=> copyBtn.textContent = 'Copy', 1400);
     });
-  </script>
+  });
+
+  testBtn.addEventListener('click', () => {
+    if(!shortLink.value) return alert('Generate first');
+    window.open(shortLink.value, '_blank');
+  });
+})();
+</script>
 </body>
 </html>
